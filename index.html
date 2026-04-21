@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.18</title>
+<title>HF Contest Trainer v6.19</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -444,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.18</div>
+    <div class="login-sub">SSB &amp; CW · v6.19</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -562,6 +562,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
   <div class="psec">
     <div class="plbl">Session Time</div>
     <div class="time-grid">
+      <button class="time-btn" id="t5" onclick="setTime(5)">5'</button>
       <button class="time-btn on" id="t10" onclick="setTime(10)">10'</button>
       <button class="time-btn" id="t15" onclick="setTime(15)">15'</button>
       <button class="time-btn" id="t20" onclick="setTime(20)">20'</button>
@@ -4272,7 +4273,7 @@ function updSM(){
 // ═══════════════════════════════════════════════════════════════════
 function setTime(m){
   timerMax=m*60;
-  ['10','15','20','30','60','0'].forEach(x=>document.getElementById('t'+x).classList.remove('on'));
+  ['5','10','15','20','30','60','0'].forEach(x=>{const el=document.getElementById('t'+x);if(el)el.classList.remove('on');});
   document.getElementById('t'+(m===0?'0':m)).classList.add('on');
   document.getElementById('tval').textContent=m===0?'∞':String(m).padStart(2,'0')+':00';
 }
