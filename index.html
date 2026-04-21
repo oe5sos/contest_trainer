@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.21</title>
+<title>HF Contest Trainer v6.22</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -444,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.21</div>
+    <div class="login-sub">SSB &amp; CW · v6.22</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -1360,6 +1360,8 @@ const VOICE_BLOCKED=[
   'microsoft linda','microsoft mike','microsoft sam','microsoft hazel desktop',
   // Other known robotic / synthetic engines
   'cepstral','nuance','speechify','ivona','acapela','svox',
+  // macOS novelty / effect voices — unverständlich
+  'whisper','bells','pipe organ','boing','trinoids','wobble','deranged',
 ];
 
 // Accent of a callsign prefix → locale bucket
@@ -1450,8 +1452,6 @@ const QUALITY_NAMES = [
   'microsoft neerja online','microsoft ravi online','microsoft heera online',
   // ── Apple iOS / iPadOS voices ─────────────────────────────────────────────
   'siri','aaron (enhanced)','nicky (enhanced)','samantha (enhanced)',
-  // ── macOS novelty / character voices (deliberately unblocked — useable for QRM/DX atmosphere)
-  'whisper','bells',
 ];
 
 function buildVoicePool(){
@@ -1475,6 +1475,7 @@ function buildVoicePool(){
     // Classify voices by lang code (primary) and name keywords (fallback)
     const byLang = (codes, kwds) => en.filter(v=>{
       if(!isQuality(v)) return false;
+      if(isBlocked(v.name.toLowerCase())) return false;   // apply blocklist here too
       if(codes.some(c=>v.lang===c)) return true;
       const nm=v.name.toLowerCase();
       return kwds ? kwds.some(k=>nm.includes(k)) : false;
@@ -1499,7 +1500,8 @@ function buildVoicePool(){
       pool = [...favVoices, ...favVoices, ...rest];   // favourites appear 2× more often
     }
     // Fallback: if quality filter found nothing, use blocked-list filter only
-    if(pool.length < 2) pool = en.filter(v=>good(v));
+    if(pool.length < 2) pool = en.filter(v=>good(v) && !isBlocked(v.name.toLowerCase()));
+    if(pool.length === 0) pool = en.filter(v=>good(v));
     if(pool.length === 0) pool = en.slice();
 
     voicePool = pool;
