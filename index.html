@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.19</title>
+<title>HF Contest Trainer v6.20</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -444,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.19</div>
+    <div class="login-sub">SSB &amp; CW · v6.20</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -5671,7 +5671,7 @@ function nextQSO(){
     }
   }
   wfRebuildSignals(); wfUpdateOverlay();
-  document.getElementById('cqst').textContent=cnt>1?'Pileup ×'+cnt+' · '+main.call:'Calling: '+main.call;
+  document.getElementById('cqst').textContent=blindMode?(cnt>1?'Pileup ×'+cnt+' · ???':'Calling: ???'):(cnt>1?'Pileup ×'+cnt+' · '+main.call:'Calling: '+main.call);
   // Focus callinput with two attempts — 30ms and 200ms — to survive speechSynthesis focus steal
   const _focusCI=()=>{ const inp=document.getElementById('callinput'); if(inp){inp.focus();inp.select();} };
   setTimeout(_focusCI, 30);
@@ -5838,7 +5838,7 @@ function nextCWItem(){
   }
   cwExpected=item;
   curQSO={call:item,exchange:{},zone:1};
-  addLine('► '+item,'cw');
+  if(!blindMode) addLine('► '+item,'cw');
   document.getElementById('cqst').textContent='Copy: '+'?'.repeat(item.length);
   document.getElementById('cw-char-main').textContent='?';
   document.getElementById('cw-char-morse').textContent='—';
@@ -5850,7 +5850,7 @@ function nextCWItem(){
   // Play interference first (background), then main signal
   playCWInterference(item);
   playCWString(item,wpm,cwTone,amp).then(()=>{
-    document.getElementById('cqst').textContent='Sent: '+item;
+    document.getElementById('cqst').textContent=blindMode?'Sent: ???':'Sent: '+item;
   });
   const inp=document.getElementById('callinput');if(inp){inp.focus();inp.select();}
 }
