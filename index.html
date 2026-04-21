@@ -608,6 +608,18 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     <div style="font-size:8px;color:var(--acc3);font-family:var(--fui);letter-spacing:.8px;min-height:12px" id="rfilt-lbl">● SSB filter active</div>
   </div>
 
+  <div class="psec">
+    <div class="plbl">Callsign visibility</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button id="hide-callsigns-btn" onclick="toggleHideCallsigns()"
+        style="flex:1;padding:4px 0;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
+               color:var(--txt2);font-size:9px;font-family:var(--fui);letter-spacing:.8px;cursor:pointer;transition:all .15s">
+        HIDE CALLSIGNS&nbsp;<span id="hide-callsigns-icon">○</span>
+      </button>
+    </div>
+    <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-top:5px;min-height:12px" id="hide-callsigns-lbl">Show real callsigns in UI</div>
+  </div>
+
   <!-- NOISE / BAND ATMOSPHERE -->
   <div class="psec">
     <div class="plbl">Band Noise <span style="font-size:7px;color:var(--txt3)">(MULTI)</span></div>
@@ -2771,7 +2783,8 @@ function wfRebuildSignals() {
   wfSignals.push({
     id: wfSignalId++, freqOff: 0, strength: mainStr, bw: mainBW,
     type: appMode === 'cw' ? 'cw' : 'main',
-    label: curQSO ? curQSO.call : '',
+    label: curQSO ? displayCallsign(curQSO.call) : '',
+    call: curQSO ? curQSO.call : '',
     qsbFreq: 0.08, qsbDepth: difficulty === 'easy' ? 0.08 : 0.28, qsbPhase: 0,
   });
 
@@ -2866,8 +2879,8 @@ function initWF() {
         if(sig.type !== 'main' && sig.type !== 'adj') return;
         const px = cx + sig.freqOff;
         const d = Math.abs(mx - px);
-        if(d < bestDist && sig.label){
-          bestDist = d; best = sig.label;
+        if(d < bestDist && (sig.call || sig.label)){
+          bestDist = d; best = sig.call || sig.label;
         }
       });
       if(best){
@@ -3579,6 +3592,42 @@ let pausedAt=0, totalPaused=0;
 let curQSO=null, qsoLog=[], sc={qso:0,pts:0,mults:0,dupes:0,busts:0};
 let mulSet=new Set(), callSet=new Set();
 let leaderboard=[], lbTab='ssb';
+let hideCallsigns = false;
+
+function obfuscatedCallLabel(){ return '[CALLSIGN]'; }
+function obfuscatedStationLabel(idx){
+  return Number.isFinite(idx) ? `[Station #${idx+1}]` : '[Station]';
+}
+function displayCallsign(call, opts = {}){
+  if(!hideCallsigns || opts.reveal) return call;
+  if(opts.spStation) return obfuscatedStationLabel(opts.spIndex);
+  return obfuscatedCallLabel();
+}
+function maskRecentHeardList(calls = []){
+  if(!hideCallsigns) return calls.join(' · ');
+  const unique = calls.map((_, i) => obfuscatedStationLabel(i));
+  return unique.join(' · ');
+}
+function refreshHideCallsignsUI(){
+  const icon = document.getElementById('hide-callsigns-icon');
+  const lbl = document.getElementById('hide-callsigns-lbl');
+  const btn = document.getElementById('hide-callsigns-btn');
+  if(icon) icon.textContent = hideCallsigns ? '●' : '○';
+  if(lbl) lbl.textContent = hideCallsigns ? 'Hide callsigns in log, waterfall and S&P panel' : 'Show real callsigns in UI';
+  if(btn){
+    btn.style.color = hideCallsigns ? 'var(--acc)' : 'var(--txt2)';
+    btn.style.borderColor = hideCallsigns ? 'rgba(74,158,255,.38)' : 'rgba(255,255,255,.12)';
+    btn.style.background = hideCallsigns ? 'rgba(74,158,255,.1)' : 'rgba(255,255,255,.04)';
+  }
+}
+function toggleHideCallsigns(){
+  hideCallsigns = !hideCallsigns;
+  refreshHideCallsignsUI();
+  spRenderStationList();
+  if(sAndPMode) wfRebuildSignalsSP(); else wfRebuildSignals();
+  wfUpdateOverlay();
+  addLine(hideCallsigns ? '🔒 Hide callsigns ON' : '🔓 Hide callsigns OFF','sys');
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // ADAPTIVE ENGINE v2 — Elo + Spaced Repetition + Reaction Time
@@ -4427,7 +4476,7 @@ function spRenderStationList(){
     const btn = document.createElement('div');
     btn.className = 'sp-station' + (spActive && spActive.call===st.call ? ' sp-active' : '');
     const zoneInfo = (contest==='cqww') ? ' · Z'+st.zone : '';
-    btn.textContent = '📡 ' + st.call + zoneInfo;
+    btn.textContent = '📡 ' + displayCallsign(st.call, {spStation:true, spIndex:idx}) + zoneInfo;
     btn.onclick = () => spTuneTo(idx);
     list.appendChild(btn);
   });
@@ -4446,8 +4495,8 @@ function spTuneTo(idx){
   if(ci){ ci.value=''; ci.classList.remove('ok2','err'); ci.focus(); }
   showExPanel(false);
   document.getElementById('input-label').textContent = T('call_input');
-  addLine('↓ Tune: '+st.call+' · CQ running','cq');
-  document.getElementById('cqst').textContent = 'Tune: '+st.call;
+  addLine('↓ Tune: '+displayCallsign(st.call, {spStation:true, spIndex:idx})+' · CQ running','cq');
+  document.getElementById('cqst').textContent = 'Tune: '+displayCallsign(st.call, {spStation:true, spIndex:idx});
   // Update S&P station list highlighting
   spRenderStationList();
   // Rebuild waterfall highlighting tuned station
@@ -4497,7 +4546,8 @@ function wfRebuildSignalsSP(){
     wfSignals.push({
       id:wfSignalId++, freqOff:off, strength:str, bw: isActive?14:8,
       type: isActive?'main':'adj',
-      label: st.call,
+      label: displayCallsign(st.call, {spStation:true, spIndex:i}),
+      call: st.call,
       qsbFreq:.06+i*.02, qsbDepth:isActive?.15:.4, qsbPhase:i*1.3
     });
   });
@@ -5366,8 +5416,10 @@ function nextQSO(){
   activePileCallsigns = callers.map(c=>c.call.toUpperCase());
   lastPileCallers = callers.slice(1).map(c=>c.call);
   setPile(cnt);
-  if(cnt===1) addLine(T('call_single', main.call),'cq');
-  else{addLine(T('pileup', cnt, callers.map(c=>c.call).join(' · ')),'pu');addLine(T('pileup_loud', main.call),'cq');}
+  const maskedMain = displayCallsign(main.call);
+  const maskedPile = callers.map(c=>displayCallsign(c.call)).join(' · ');
+  if(cnt===1) addLine(T('call_single', maskedMain),'cq');
+  else{addLine(T('pileup', cnt, maskedPile),'pu');addLine(T('pileup_loud', maskedMain),'cq');}
   if(difficulty!=='easy'&&audioCtx&&Math.random()<.25&&!mainSpeaking) beep(rI(150,450),.035,.04);
 
   exPhase=1;
@@ -5420,7 +5472,7 @@ function nextQSO(){
     }
   }
   wfRebuildSignals(); wfUpdateOverlay();
-  document.getElementById('cqst').textContent=cnt>1?'Pileup ×'+cnt+' · '+main.call:'Calling: '+main.call;
+  document.getElementById('cqst').textContent=cnt>1?'Pileup ×'+cnt+' · '+maskedMain:'Calling: '+maskedMain;
   // Focus callinput with two attempts — 30ms and 200ms — to survive speechSynthesis focus steal
   const _focusCI=()=>{ const inp=document.getElementById('callinput'); if(inp){inp.focus();inp.select();} };
   setTimeout(_focusCI, 30);
@@ -5480,10 +5532,10 @@ function submitQSO(){
       if(el){el.classList.add('err');setTimeout(()=>el.classList.remove('err'),1100);}
       // Show hint: list all recently heard calls if any, else standard bust
       if(heardCallsHistory.size > 0) {
-        const recentList = [...heardCallsHistory.keys()].join(' · ');
+        const recentList = maskRecentHeardList([...heardCallsHistory.keys()]);
         addLine('❓ Nicht gehört — Zuletzt aktiv: '+recentList,'er');
       } else {
-        addLine(T('bust_expected', curQSO.call),'er');
+        addLine(T('bust_expected', displayCallsign(curQSO.call)),'er');
         speak(callToSpeech(curQSO.call,false),curQSO.call,()=>{});
       }
       if(el){el.value='';el.focus();}
@@ -6691,6 +6743,7 @@ window.addEventListener('load',function(){
     // updClk();
     // setInterval(updClk,1000);
     setTime(10);setDiff('easy');
+    refreshHideCallsignsUI();
     document.getElementById('nb-band').classList.add('on');
     updateNoiseLabel();
     updateRFiltLabel();
