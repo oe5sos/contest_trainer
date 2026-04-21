@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.20</title>
+<title>HF Contest Trainer v6.21</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -444,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.20</div>
+    <div class="login-sub">SSB &amp; CW · v6.21</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -4606,8 +4606,7 @@ function addLine(txt,cls){
     const d=document.getElementById(id);
     const l=document.createElement('div');l.className=clsN+' '+(cls||'');
     if(blindMode && (cls==='cq'||cls==='pu')){
-      const sp=document.createElement('span');sp.className='blind-call';
-      sp.title='Hover zum Aufdecken';sp.textContent=txt;l.appendChild(sp);
+      l.textContent=txt.replace(/[A-Z0-9]{3,}(?:\/[A-Z0-9]+)?/g,'???');
     }else{l.textContent=txt;}
     d.appendChild(l);d.scrollTop=d.scrollHeight;
     if(d.children.length>60) d.removeChild(d.firstChild);
@@ -5438,7 +5437,7 @@ function submitExchange(){
     const tot=sc.qso+sc.busts;
     document.getElementById('s-acc').textContent=tot>0?Math.round(sc.qso/tot*100)+'%':'—';
     document.getElementById('big-score').textContent=(sc.pts*Math.max(1,sc.mults)).toLocaleString();
-    document.getElementById('bbar-status').textContent=T('ok_call', curQSO.call);
+    document.getElementById('bbar-status').textContent=blindMode?T('ok_call','???'):T('ok_call', curQSO.call);
     const loggedCall = curQSO.call;
     qsoLog.unshift({call:loggedCall,expected:loggedCall,bust:false,dupe:false,pts:getPts(),cat:curQSO.cat,zone:parseInt(curQSO.exchange&&curQSO.exchange.zone?curQSO.exchange.zone:curQSO.zone||0,10)});
     updLog();
@@ -5734,7 +5733,7 @@ function submitQSO(){
         const recentList = [...heardCallsHistory.keys()].join(' · ');
         addLine('❓ Nicht gehört — Zuletzt aktiv: '+recentList,'er');
       } else {
-        addLine(T('bust_expected', curQSO.call),'er');
+        addLine(T('bust_expected', blindMode?'???':curQSO.call),'er');
         speak(callToSpeech(curQSO.call,false),curQSO.call,()=>{});
       }
       if(el){el.value='';el.focus();}
@@ -5816,7 +5815,7 @@ function submitQSO(){
   document.getElementById('s-acc').textContent=tot>0?Math.round(sc.qso/tot*100)+'%':'—';
   document.getElementById('s-busts').textContent=sc.busts;
   document.getElementById('big-score').textContent=(sc.pts*Math.max(1,sc.mults)).toLocaleString();
-  document.getElementById('bbar-status').textContent=isDupe?T('dupe_status'):isBust?T('bust_status', curQSO.call):T('ok_call', entered);
+  document.getElementById('bbar-status').textContent=isDupe?T('dupe_status'):isBust?T('bust_status', blindMode?'???':curQSO.call):T('ok_call', entered);
   qsoLog.unshift(entry);updLog();
   if(el) el.value='';
   curQSO=null;
