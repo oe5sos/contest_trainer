@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.22</title>
+<title>HF Contest Trainer v6.23</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -444,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.22</div>
+    <div class="login-sub">SSB &amp; CW · v6.23</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -5790,13 +5790,13 @@ function submitQSO(){
   if(isDupe){
     sc.dupes++;addLine(T('dupe', entered),'er');beep(240,.18,.14);
   }else if(isBust){
-    sc.busts++;addLine(T('bust_logged', entered, curQSO.call),'er');
+    sc.busts++;addLine(T('bust_logged', entered, blindMode?'???':curQSO.call),'er');
     beep(155,.22,.22);
     if(el){el.classList.add('err');setTimeout(()=>el.classList.remove('err'),1100);}
     updAdapt(false, cat);
     const savedQSO = curQSO;
     const repeatMsg = callToSpeech(savedQSO.call, false);
-    addLine(T('bust_repeat', savedQSO.call),'sys');
+    addLine(T('bust_repeat', blindMode?'???':savedQSO.call),'sys');
     speak(repeatMsg, savedQSO.call, ()=>{});
     if(el) el.value='';
     curQSO = savedQSO;
@@ -5873,7 +5873,7 @@ function submitCW(){
     updAdapt(true);
   }else{
     sc.busts++;
-    addLine(T('cw_bust', entered, cwExpected),'er');
+    addLine(T('cw_bust', entered, blindMode?'???':cwExpected),'er');
     beep(155,.22,.22);
     if(el){el.classList.add('err');setTimeout(()=>el.classList.remove('err'),1100);}
     updAdapt(false);
