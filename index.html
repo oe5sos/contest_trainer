@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.17</title>
+<title>HF Contest Trainer v6.18</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
@@ -279,6 +279,11 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 /* ── S&P MODE BUTTON ── */
 .sp-toggle{padding:5px 14px;font-size:10px;font-family:var(--fui);font-weight:600;letter-spacing:1px;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--txt3);border-radius:20px;transition:all .15s;text-transform:uppercase}
 .sp-toggle.sp-on{background:rgba(255,149,0,.12);border-color:rgba(255,149,0,.5);color:var(--acc3)}
+/* ── BLIND MODE ── */
+.blind-call{filter:blur(5px);user-select:none;transition:filter .3s;cursor:pointer}
+.blind-call:hover{filter:blur(0px)}
+.sp-toggle.blind-on{background:rgba(255,69,58,.12);border-color:rgba(255,69,58,.5);color:var(--red)}
+[data-theme="light"] .sp-toggle.blind-on{background:rgba(198,58,47,.1);border-color:rgba(198,58,47,.45);color:var(--red)}
 .sp-station{padding:4px 8px;font-size:9px;font-family:var(--fmono);cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--txt3);border-radius:6px;transition:all .12s;white-space:nowrap;letter-spacing:.5px}
 .sp-station:hover{background:rgba(255,149,0,.1);border-color:rgba(255,149,0,.3);color:var(--acc3)}
 .sp-station.sp-active{background:rgba(255,149,0,.15);border-color:rgba(255,149,0,.6);color:var(--acc3);animation:spblink .9s infinite}
@@ -412,6 +417,24 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 .bbar{background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.08);padding:3px 14px;display:flex;align-items:center;justify-content:space-between;font-family:var(--fui);font-size:10px;color:var(--txt3);flex-shrink:0;height:24px}
 .bbar strong{color:var(--acc)}
 
+/* ── VOICE LAB ── */
+.vl-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.vl-row:last-child{border-bottom:none}
+.vl-name{flex:1;font-family:var(--fmono);font-size:10px;color:var(--txt2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vl-lang{font-size:8px;color:var(--txt3);font-family:var(--fmono);width:46px;flex-shrink:0}
+.vl-badge{font-size:7px;padding:1px 5px;border-radius:3px;border:1px solid;flex-shrink:0}
+.vl-badge.neural{border-color:rgba(74,158,255,.4);color:var(--acc)}
+.vl-badge.premium{border-color:rgba(191,90,242,.4);color:var(--purple)}
+.vl-badge.standard{border-color:rgba(255,255,255,.1);color:var(--txt3)}
+.vl-test{font-size:9px;padding:2px 8px;border:1px solid rgba(255,255,255,.14);background:transparent;color:var(--txt2);border-radius:4px;cursor:pointer;font-family:var(--fui);white-space:nowrap}
+.vl-test:hover{border-color:var(--acc);color:var(--acc)}
+.vl-fav{font-size:13px;cursor:pointer;opacity:.3;transition:opacity .15s;flex-shrink:0;background:none;border:none;padding:0}
+.vl-fav.on{opacity:1}
+.vl-section{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--txt3);text-transform:uppercase;padding:8px 0 4px;font-family:var(--fui)}
+.vl-pool-row{display:flex;align-items:center;gap:6px;margin:3px 0}
+.vl-pool-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.vl-pool-lbl{font-size:9px;font-family:var(--fmono);color:var(--txt2)}
+.vl-empty{font-size:10px;color:var(--txt3);font-style:italic;padding:8px 0;text-align:center}
 
 </style>
 </head>
@@ -421,7 +444,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.17</div>
+    <div class="login-sub">SSB &amp; CW · v6.18</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -458,7 +481,9 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     <span class="led" id="rx-led"></span>
     <div class="hclock" id="clk">--:--:--z</div>
     <button class="sp-toggle" id="sp-toggle-btn" onclick="toggleSPMode()" title="Search &amp; Pounce: Scan band, click station to work">RUN</button>
-<button class="sp-toggle" onclick="showManual()" title="Open Manual" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-size:12px;padding:4px 11px">?</button>
+    <button class="sp-toggle" onclick="showVoiceLab()" title="Voice Lab — Stimmen auswählen &amp; testen" style="border-color:rgba(191,90,242,.35);color:var(--purple);font-size:12px;padding:4px 11px">🎙</button>
+    <button class="sp-toggle" onclick="showManual()" title="Open Manual" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-size:12px;padding:4px 11px">?</button>
+    <button class="sp-toggle" id="blind-toggle-btn" onclick="toggleBlindMode()" title="Rufzeichen ausblenden — nur nach Gehör arbeiten">👁 BLIND</button>
     <div class="mycall-badge" id="mycall-badge" onclick="showLeaderboard()">—</div>
   </div>
 </div>
@@ -557,19 +582,6 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
         <span class="diff-name">HARD</span><span style="font-size:9px;color:var(--red)">★★★</span>
       </div>
     </div>
-    <!-- AUTO ADAPT toggle -->
-    <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
-      <button id="btn-autoadapt" onclick="toggleAutoAdapt()"
-        style="flex:1;padding:4px 0;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
-               color:var(--txt2);font-size:9px;font-family:var(--fui);letter-spacing:.8px;cursor:pointer;transition:all .15s"
-        title="Automatically adjusts pile size, RF filter and QSB based on your hit rate">
-        AUTO ADAPT&nbsp;<span id="autoadapt-icon">○</span>
-      </button>
-      <span id="autoadapt-lv" style="font-size:9px;font-family:var(--fmono);color:var(--txt3);min-width:28px;text-align:right"></span>
-    </div>
-    <div style="margin-top:3px;height:3px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden">
-      <div id="autoadapt-bar" style="height:100%;width:0%;background:var(--acc);transition:width .4s;border-radius:2px"></div>
-    </div>
     <div style="font-size:9px;color:var(--acc2);font-family:var(--fui);margin-top:5px;text-align:center;opacity:.8" id="adapt-hint">● Adaptive training active</div>
   </div>
 
@@ -631,33 +643,6 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     </div>
     <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--txt3);font-family:var(--fui);margin:-3px 0 2px 46px">
       <span>off</span><span>loud</span>
-    </div>
-    <!-- BAND CHARACTER -->
-    <div style="margin-top:7px">
-      <div style="font-size:8px;letter-spacing:.8px;color:var(--txt3);font-family:var(--fui);margin-bottom:3px">BAND CHARACTER</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px" id="band-profile-grid">
-        <button class="noise-btn on" id="bp-20m" onclick="setBandProfile('20m')" title="14 MHz — standard contest conditions">20m</button>
-        <button class="noise-btn"   id="bp-40m" onclick="setBandProfile('40m')" title="7 MHz night — heavy QRM, deep fading">40m night</button>
-        <button class="noise-btn"   id="bp-15m" onclick="setBandProfile('15m')" title="21/28 MHz — low noise, rapid flutter">15/10m</button>
-        <button class="noise-btn"   id="bp-80m" onclick="setBandProfile('80m')" title="3.5/1.8 MHz — heavy atmospheric, crashes">80/160m</button>
-      </div>
-    </div>
-    <!-- EXTRA QRM TYPES -->
-    <div style="margin-top:6px">
-      <div style="font-size:8px;letter-spacing:.8px;color:var(--txt3);font-family:var(--fui);margin-bottom:3px">EXTRA QRM</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px">
-        <button class="noise-btn" id="nb-splatter"  onclick="toggleExtraQRM('splatter')"  title="Splatter — overmodulated adjacent station">Splatter</button>
-        <button class="noise-btn" id="nb-keyclicks" onclick="toggleExtraQRM('keyclicks')" title="Key-clicks — badly shaped CW transmitter">Clicks</button>
-        <button class="noise-btn" id="nb-birdie"    onclick="toggleExtraQRM('birdie')"    title="Birdie — stable mixer product in receiver">Birdie</button>
-      </div>
-    </div>
-  </div>
-  <!-- CW REALISM -->
-  <div class="psec" id="cw-realism-sec" style="display:none">
-    <div class="plbl">CW Realism</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
-      <button class="noise-btn" id="cw-chirp-btn" onclick="toggleCWChirp()" title="Chirp — frequency shift at element start (vintage rigs)">Chirp</button>
-      <button class="noise-btn" id="cw-drift-btn" onclick="toggleCWDrift()" title="Drift — slow VFO frequency wander">Drift</button>
     </div>
   </div>
 
@@ -933,6 +918,86 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
   </div>
 </div>
 
+<!-- VOICE LAB OVERLAY -->
+<div class="ov" id="vl-ov" style="display:none">
+  <div class="ovbox" style="max-width:640px;width:98%">
+    <div class="ovt" style="color:var(--purple)">🎙 VOICE LAB</div>
+
+    <!-- Tabs -->
+    <div class="lb-tabs" style="margin-bottom:12px">
+      <div class="lb-tab on" id="vlt-el"  onclick="vlTab('el')"  style="border-color:rgba(191,90,242,.4);color:var(--purple);background:rgba(191,90,242,.08)">🤖 ElevenLabs</div>
+      <div class="lb-tab"    id="vlt-sys" onclick="vlTab('sys')">💻 System-Stimmen</div>
+    </div>
+
+    <!-- ══ TAB: ELEVENLABS ══ -->
+    <div id="vl-tab-el">
+      <!-- API Key row -->
+      <div style="background:var(--bg0);border:1px solid rgba(191,90,242,.2);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:var(--purple);font-family:var(--fui);margin-bottom:8px">API-KEY · elevenlabs.io → Profile → API Keys</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <input id="el-key-input" type="password" placeholder="xi_…" style="flex:1;font-family:var(--fmono);font-size:11px;background:var(--bg1);border:1px solid rgba(255,255,255,.12);color:var(--txt);padding:6px 10px;border-radius:6px;outline:none">
+          <button onclick="elConnect()" style="padding:6px 14px;font-size:10px;font-weight:700;border:1px solid rgba(191,90,242,.5);color:var(--purple);background:rgba(191,90,242,.08);border-radius:6px;cursor:pointer;font-family:var(--fui);white-space:nowrap">VERBINDEN</button>
+          <button onclick="elDisconnect()" style="padding:6px 10px;font-size:10px;border:1px solid rgba(255,69,58,.3);color:var(--red);background:transparent;border-radius:6px;cursor:pointer;font-family:var(--fui)" title="Trennen & API-Key löschen">✕</button>
+        </div>
+        <div id="el-status" style="font-size:9px;color:var(--txt3);font-family:var(--fmono);min-height:14px">Nicht verbunden</div>
+        <!-- Model selector -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:8px;color:var(--txt3);font-family:var(--fui);letter-spacing:1px;flex-shrink:0">MODELL</span>
+          <select id="el-model" onchange="elSetModel(this.value)" style="font-size:9px;flex:1;padding:4px 8px">
+            <option value="eleven_flash_v2_5">Flash v2.5 — schnellste Latenz</option>
+            <option value="eleven_turbo_v2_5" selected>Turbo v2.5 — Qualität &amp; Speed ✓ (empfohlen)</option>
+            <option value="eleven_multilingual_v2">Multilingual v2 — maximale Qualität</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Voice mapping by accent -->
+      <div style="font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--txt3);font-family:var(--fui);margin-bottom:6px">STIMMEN NACH AKZENT ZUWEISEN</div>
+      <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-bottom:8px">Jeder Rufzeichen-Präfix bekommt automatisch den passenden Akzent.</div>
+      <div id="el-voice-map" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px"></div>
+
+      <!-- Test phrase -->
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px">
+        <span style="font-size:9px;color:var(--txt3);font-family:var(--fui);white-space:nowrap">Test-Satz:</span>
+        <select id="vl-phrase" style="font-size:9px;flex:1">
+          <option value="dl3ab">Delta Lima Three Alpha Bravo — five nine — Contest</option>
+          <option value="oe5">Oscar Echo Five X-ray Lima Mike — five nine fourteen</option>
+          <option value="cq">CQ Contest CQ Contest — Delta Lima Three Alpha Bravo</option>
+          <option value="dx">Victor Kilo Nine X-ray — five nine — zone three</option>
+        </select>
+      </div>
+
+      <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);padding:8px;background:rgba(191,90,242,.04);border:1px solid rgba(191,90,242,.12);border-radius:6px;line-height:1.6">
+        ℹ Free-Tier: 10.000 Zeichen/Monat · Audio wird gecacht — jedes Rufzeichen nur 1× abgerufen · Kostenloser Account auf elevenlabs.io reicht für hunderte Trainings-Sessions.
+      </div>
+    </div>
+
+    <!-- ══ TAB: SYSTEM VOICES ══ -->
+    <div id="vl-tab-sys" style="display:none">
+      <div id="vl-pool-info" style="background:var(--bg0);border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:9px"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10px;color:var(--txt2);font-family:var(--fui)">
+          <input type="checkbox" id="vl-favonly" onchange="vlFavOnlyChanged()" style="accent-color:var(--purple)">
+          Nur Favoriten verwenden
+        </label>
+        <span style="flex:1"></span>
+        <span id="vl-found" style="font-size:9px;color:var(--txt3);font-family:var(--fmono)"></span>
+      </div>
+      <div id="vl-list" style="max-height:44vh;overflow-y:auto;padding-right:4px"></div>
+      <div style="margin-top:8px;display:flex;gap:6px;align-items:center">
+        <span style="font-size:9px;color:var(--txt3);font-family:var(--fui);white-space:nowrap">Test:</span>
+        <select id="vl-phrase-sys" style="font-size:9px;flex:1">
+          <option value="dl3ab">Delta Lima Three Alpha Bravo — five nine — Contest</option>
+          <option value="oe5">Oscar Echo Five X-ray Lima Mike — five nine fourteen</option>
+          <option value="cq">CQ Contest CQ Contest — Delta Lima Three Alpha Bravo</option>
+          <option value="dx">Victor Kilo Nine X-ray — five nine — zone three</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="document.getElementById('vl-ov').style.display='none'" style="width:100%;text-align:center;margin-top:12px">SCHLIESSEN</button>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
@@ -1266,6 +1331,8 @@ function pickVoiceByIndex(idx){
 // the main-signal utterance by tracking it separately.
 let mainUtterance = null;
 function cancelMain(){
+  // Stop ElevenLabs audio if active
+  if(typeof elCancelCurrent === 'function') elCancelCurrent();
   if(mainUtterance){
     try{ mainUtterance.onend=null; mainUtterance.onerror=null; }catch(e){}
   }
@@ -1388,6 +1455,7 @@ const QUALITY_NAMES = [
 
 function buildVoicePool(){
   try{
+    vlLoadFavs();
     const all = window.speechSynthesis.getVoices();
     const en = all.filter(v=>v.lang && v.lang.startsWith('en'));
 
@@ -1395,8 +1463,12 @@ function buildVoicePool(){
     const good = v => !isBlocked(v.name.toLowerCase());
 
     // ── QUALITY WHITELIST ─────────────────────────────────────────────────────
+    // If user has favourites AND favOnly mode: limit to favourites
+    const isFav = v => vlFavSet.has(v.name);
     const isQuality = v => {
-      return QUALITY_NAMES.some(q => v.name.toLowerCase().includes(q));
+      if(vlFavOnly && vlFavSet.size > 0) return isFav(v);
+      // otherwise: QUALITY_NAMES whitelist OR user-starred favourites
+      return QUALITY_NAMES.some(q => v.name.toLowerCase().includes(q)) || isFav(v);
     };
 
     // Classify voices by lang code (primary) and name keywords (fallback)
@@ -1419,6 +1491,12 @@ function buildVoicePool(){
     let pool = [...usVoices,...usVoices,...usVoices,...gbVoices,...gbVoices,...gbVoices,...caVoices,...auVoices,...nzVoices,...ieVoices,...inVoices,...zaVoices];
     // Deduplicate
     pool = [...new Map(pool.map(v=>[v.name,v])).values()];
+    // Boost user-starred favourites to the front (appear first in round-robin)
+    if(vlFavSet.size > 0){
+      const favVoices = pool.filter(v=>vlFavSet.has(v.name));
+      const rest      = pool.filter(v=>!vlFavSet.has(v.name));
+      pool = [...favVoices, ...favVoices, ...rest];   // favourites appear 2× more often
+    }
     // Fallback: if quality filter found nothing, use blocked-list filter only
     if(pool.length < 2) pool = en.filter(v=>good(v));
     if(pool.length === 0) pool = en.slice();
@@ -1444,6 +1522,181 @@ function buildVoicePool(){
     console.log('✅ Voices — US:'+usVoices.length+' GB:'+gbVoices.length+' AU:'+auVoices.length+' IE:'+ieVoices.length+' IN:'+inVoices.length+' ZA:'+zaVoices.length+' Pool:'+pool.length);
     pickAdjVoice();
   }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VOICE LAB — discover, audition & favourite voices on this system
+// ═══════════════════════════════════════════════════════════════════
+let vlFavSet = new Set();   // names of favourite voices
+let vlFavOnly = false;      // if true: pool = only favourites
+
+function vlLoadFavs(){
+  try{
+    const d = JSON.parse(localStorage.getItem('hfct_voice_favs')||'{}');
+    vlFavSet = new Set(d.favs||[]);
+    vlFavOnly = !!d.favOnly;
+  }catch(e){ vlFavSet=new Set(); vlFavOnly=false; }
+}
+function vlSaveFavs(){
+  try{ localStorage.setItem('hfct_voice_favs', JSON.stringify({favs:[...vlFavSet], favOnly:vlFavOnly})); }catch(e){}
+}
+
+function vlQuality(v){
+  const nm = v.name.toLowerCase();
+  // Premium = macOS Enhanced/Premium, Azure Neural Online
+  if(/premium|enhanced|online natural/.test(nm)) return 'premium';
+  // Neural = known neural voice names or lang-matched quality names
+  if(QUALITY_NAMES.some(q=>nm.includes(q))) return 'neural';
+  return 'standard';
+}
+
+function vlTestPhrase(){
+  const sel = document.getElementById('vl-phrase');
+  const phrases = {
+    dl3ab: 'Delta Lima Three Alpha Bravo, five nine, Contest',
+    oe5:   'Oscar Echo Five X-ray Lima Mike, five nine fourteen',
+    cq:    'CQ Contest, CQ Contest, Delta Lima Three Alpha Bravo',
+    dx:    'Victor Kilo Nine X-ray, five nine, zone three',
+  };
+  return phrases[sel ? sel.value : 'dl3ab'] || phrases.dl3ab;
+}
+
+function vlTestVoice(name){
+  try{
+    window.speechSynthesis.cancel();
+    const all = window.speechSynthesis.getVoices();
+    const v = all.find(x=>x.name===name);
+    if(!v) return;
+    const u = new SpeechSynthesisUtterance(vlTestPhrase());
+    u.voice = v;  u.rate = 1.0;  u.pitch = 1.0;  u.volume = 0.92;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function vlToggleFav(name){
+  if(vlFavSet.has(name)) vlFavSet.delete(name);
+  else vlFavSet.add(name);
+  vlSaveFavs();
+  // Update star button without re-rendering the whole list
+  document.querySelectorAll('.vl-fav').forEach(btn=>{
+    if(btn.dataset.vname === name){
+      btn.textContent = vlFavSet.has(name) ? '★' : '☆';
+      btn.classList.toggle('on', vlFavSet.has(name));
+    }
+  });
+  // Rebuild pool if favOnly mode
+  if(vlFavOnly) buildVoicePool();
+}
+
+function vlFavOnlyChanged(){
+  vlFavOnly = document.getElementById('vl-favonly').checked;
+  vlSaveFavs();
+  buildVoicePool();
+}
+
+// Groups voices by accent for the Voice Lab display
+function vlAccentLabel(v){
+  const lang = (v.lang||'').toLowerCase();
+  if(lang.startsWith('en-us')||lang==='en') return '🇺🇸 US';
+  if(lang.startsWith('en-gb'))  return '🇬🇧 GB';
+  if(lang.startsWith('en-au'))  return '🇦🇺 AU';
+  if(lang.startsWith('en-ca'))  return '🇨🇦 CA';
+  if(lang.startsWith('en-ie'))  return '🇮🇪 IE';
+  if(lang.startsWith('en-nz'))  return '🇳🇿 NZ';
+  if(lang.startsWith('en-in'))  return '🇮🇳 IN';
+  if(lang.startsWith('en-za'))  return '🇿🇦 ZA';
+  return '🌐 Other';
+}
+
+function showVoiceLab(){
+  vlLoadFavs();
+  const ov = document.getElementById('vl-ov');
+  ov.style.display = 'flex';
+  const all = window.speechSynthesis.getVoices();
+  const en  = all.filter(v => v.lang && v.lang.startsWith('en'));
+
+  // Pool info panel
+  const poolInfo = document.getElementById('vl-pool-info');
+  const cats = [
+    {lbl:'🇺🇸 US', n: en.filter(v=>v.lang==='en-US'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇬🇧 GB', n: en.filter(v=>v.lang==='en-GB'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇦🇺 AU', n: en.filter(v=>v.lang==='en-AU'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇨🇦 CA', n: en.filter(v=>v.lang==='en-CA'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇮🇳 IN', n: en.filter(v=>v.lang==='en-IN'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇿🇦 ZA', n: en.filter(v=>v.lang==='en-ZA'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🇮🇪 IE', n: en.filter(v=>v.lang==='en-IE'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+    {lbl:'🌐 All',  n: voicePool.length},
+  ];
+  poolInfo.innerHTML = '<div style="font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--txt3);font-family:var(--fui);margin-bottom:5px">GEFUNDENE QUALITÄTSSTIMMEN</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px">'
+    + cats.map(c=>`<span style="font-family:var(--fmono);font-size:9px;color:${c.n>0?'var(--acc)':'var(--txt3)'};">${c.lbl} <strong>${c.n}</strong></span>`).join('')
+    + '</div>';
+
+  // Total count
+  document.getElementById('vl-found').textContent = en.length + ' Stimmen gesamt';
+  document.getElementById('vl-favonly').checked = vlFavOnly;
+
+  // Build voice list grouped by accent
+  const BLOCKED = VOICE_BLOCKED;
+  const isBlocked = nm => BLOCKED.some(b=>nm.includes(b));
+
+  // Sort: favourites first, then by quality, then by name
+  const sorted = [...en].sort((a,b)=>{
+    const af = vlFavSet.has(a.name) ? 0 : 1;
+    const bf = vlFavSet.has(b.name) ? 0 : 1;
+    if(af!==bf) return af-bf;
+    const aq = vlQuality(a)==='premium' ? 0 : vlQuality(a)==='neural' ? 1 : 2;
+    const bq = vlQuality(b)==='premium' ? 0 : vlQuality(b)==='neural' ? 1 : 2;
+    if(aq!==bq) return aq-bq;
+    return a.name.localeCompare(b.name);
+  });
+
+  const listDiv = document.getElementById('vl-list');
+  listDiv.innerHTML = '';
+
+  // Favourites section header if any
+  const favs = sorted.filter(v=>vlFavSet.has(v.name));
+  const others = sorted.filter(v=>!vlFavSet.has(v.name));
+
+  function makeRow(v){
+    const q   = vlQuality(v);
+    const blk = isBlocked(v.name.toLowerCase());
+    const isFav = vlFavSet.has(v.name);
+    const row = document.createElement('div');
+    row.className = 'vl-row';
+    if(blk) row.style.opacity = '.35';
+    row.innerHTML = `
+      <button class="vl-fav${isFav?' on':''}" data-vname="${v.name.replace(/"/g,'&quot;')}" onclick="vlToggleFav('${v.name.replace(/'/g,"\\'")}')" title="Favorit">${isFav?'★':'☆'}</button>
+      <div class="vl-name" title="${v.name}">${v.name}</div>
+      <div class="vl-lang">${(v.lang||'?').slice(0,5)}</div>
+      <span class="vl-badge ${q}">${q}</span>
+      ${blk ? '<span style="font-size:7px;color:var(--red)">BLOCKED</span>' : `<button class="vl-test" onclick="vlTestVoice('${v.name.replace(/'/g,"\\'")}')" title="Test">▶ Test</button>`}
+    `;
+    return row;
+  }
+
+  if(favs.length){
+    const hdr = document.createElement('div');
+    hdr.className = 'vl-section';
+    hdr.textContent = '★ Favoriten';
+    listDiv.appendChild(hdr);
+    favs.forEach(v=>listDiv.appendChild(makeRow(v)));
+  }
+
+  if(others.length){
+    const hdr = document.createElement('div');
+    hdr.className = 'vl-section';
+    hdr.textContent = others.length + ' weitere Stimmen';
+    listDiv.appendChild(hdr);
+    others.forEach(v=>listDiv.appendChild(makeRow(v)));
+  }
+
+  if(en.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'vl-empty';
+    empty.textContent = 'Keine Stimmen gefunden — bitte Browser-TTS aktivieren.';
+    listDiv.appendChild(empty);
+  }
 }
 
 // ── FIXED ADJ VOICE ──
@@ -1622,52 +1875,24 @@ function setRFilt(v) {
 }
 
 // QSB envelope: per-station random LFO that slowly modulates amplitude
-// Returns a function that gives current gain multiplier (0.05–1.0)
-// Three-layer: slow ionospheric fade + medium flutter + rapid polar flutter
-// Band profile scales depth and adds occasional deep-fade events
+// Returns a function that gives current gain multiplier (0.3–1.0)
 function makeQSBEnvelope(call) {
+  // Seed a deterministic phase from the callsign so each station
+  // has its own independent fading pattern
   let h = 0;
   for (let i = 0; i < call.length; i++) h = (h * 31 + call.charCodeAt(i)) >>> 0;
-  const phase   = (h % 1000) / 1000 * Math.PI * 2;
-
-  // Layer 1: slow ionospheric fade (0.05–0.18 Hz)
-  const freq1   = 0.05 + (h % 17) * 0.008;
-  // Layer 2: medium flutter (0.25–0.75 Hz)
-  const freq2   = 0.25 + (h % 11) * 0.045;
-  // Layer 3: rapid polar/sporadic-E flutter (1.5–5 Hz)
-  const freq3   = 1.5  + (h % 9)  * 0.4;
-
-  // Depth multipliers — scaled further by BAND_PROFILES at runtime
-  const depth1  = 0.28 + (h % 5)  * 0.08;
-  const depth2  = 0.07 + (h % 7)  * 0.02;
-  const depth3  = 0.04 + (h % 5)  * 0.012;
-
-  // Deep-fade: every N seconds signal briefly drops to near-zero
-  const deepInterval = 12 + (h % 11) * 2.5;  // 12–37 s
-  const deepDuration = 0.6 + (h % 5)  * 0.2;  // 0.6–1.6 s width
-
+  const phase  = (h % 1000) / 1000 * Math.PI * 2;
+  const freq1  = 0.08 + (h % 17) * 0.006;   // 0.08–0.18 Hz slow fade
+  const freq2  = 0.3  + (h % 11) * 0.04;    // 0.3–0.74 Hz flutter
+  const depth1 = 0.25 + (h % 5) * 0.08;     // how deep the slow fade goes
+  const depth2 = 0.06 + (h % 7) * 0.02;     // how deep the flutter goes
   return function() {
-    const t  = Date.now() / 1000;
-    const bp = BAND_PROFILES[bandProfile] || BAND_PROFILES['20m'];
-    const dScale = bp.qsbDepth;      // band multiplier for overall depth
-
-    const s1 = Math.sin(t * freq1 * 2 * Math.PI + phase);
-    const s2 = Math.sin(t * freq2 * 2 * Math.PI + phase * 1.3);
-    const s3 = Math.sin(t * freq3 * 2 * Math.PI + phase * 0.7);
-
-    // Deep-fade: uses a narrow sin pulse that fires periodically
-    const tMod    = t % deepInterval;
-    const tCenter = deepInterval * 0.45;   // fire at 45% of cycle
-    const norm    = (tMod - tCenter) / (deepDuration * 0.5);
-    const deepFade = (Math.abs(norm) < 1) ? (1 - norm*norm) * 0.75 * bp.deepFade : 0;
-
-    const env = 1.0
-      - depth1 * dScale * (0.5 + 0.5 * s1)
-      - depth2 * dScale * (0.5 + 0.5 * s2)
-      - depth3 * bp.flutter * (0.5 + 0.5 * s3)
-      - deepFade;
-
-    return Math.max(0.04, Math.min(1.0, env));
+    const t = Date.now() / 1000;
+    const slow = Math.sin(t * freq1 * 2 * Math.PI + phase);
+    const fast = Math.sin(t * freq2 * 2 * Math.PI + phase * 1.3);
+    // combine: slow envelope + fast flutter
+    const env = 1.0 - depth1 * (0.5 + 0.5 * slow) - depth2 * (0.5 + 0.5 * fast);
+    return Math.max(0.12, Math.min(1.0, env));
   };
 }
 
@@ -1676,167 +1901,6 @@ const callQSBMap = new Map();
 function getQSBForCall(call) {
   if (!callQSBMap.has(call)) callQSBMap.set(call, makeQSBEnvelope(call));
   return callQSBMap.get(call);
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// BAND CHARACTER PROFILES
-// Each band profile defines multipliers for noise & QSB behaviour.
-// qsbDepth  : scale factor for slow+medium fading layers (1.0 = normal)
-// flutter   : scale factor for rapid (1.5–5 Hz) flutter layer
-// deepFade  : probability/depth of total-dropout events (0 = none)
-// noiseFloor: base noise level multiplier
-// splatRate : inter-splatter interval multiplier (lower = more frequent)
-// ═══════════════════════════════════════════════════════════════════
-const BAND_PROFILES = {
-  '20m': { label:'20m',  qsbDepth:1.0, flutter:0.5, deepFade:0.5, noiseFloor:1.0, splatRate:1.0 },
-  '40m': { label:'40m',  qsbDepth:1.6, flutter:0.8, deepFade:1.2, noiseFloor:1.5, splatRate:0.6 },
-  '15m': { label:'15m',  qsbDepth:0.7, flutter:2.2, deepFade:0.3, noiseFloor:0.5, splatRate:1.4 },
-  '80m': { label:'80m',  qsbDepth:2.2, flutter:0.3, deepFade:2.5, noiseFloor:2.2, splatRate:0.4 },
-};
-let bandProfile = '20m';
-
-function setBandProfile(p){
-  bandProfile = p;
-  // Update buttons
-  Object.keys(BAND_PROFILES).forEach(k=>{
-    const b = document.getElementById('bp-'+k);
-    if(b) b.classList.toggle('on', k===p);
-  });
-  // Adjust base noise gain via band noise floor multiplier
-  updateNoiseGains();
-  // Restart contest noise to pick up new splatter rate
-  if(activeNoiseModes.has('contest') && audioCtx) startContestNoise();
-}
-
-// ── EXTRA QRM — Splatter / Key-Clicks / Birdie ──────────────────────
-const extraQRM = new Set();   // active extra QRM types
-let splatterHandle = null;
-let birdieNodes = [];
-let keyclickHandle = null;
-
-function toggleExtraQRM(type){
-  const btn = document.getElementById('nb-'+type);
-  if(extraQRM.has(type)){
-    extraQRM.delete(type);
-    if(btn) btn.classList.remove('on');
-    stopExtraQRM(type);
-  } else {
-    extraQRM.add(type);
-    if(btn) btn.classList.add('on');
-    if(audioCtx) startExtraQRM(type);
-  }
-}
-
-function startExtraQRM(type){
-  if(!audioCtx) return;
-  if(type==='splatter')  startSplatter();
-  if(type==='keyclicks') startKeyClicks();
-  if(type==='birdie')    startBirdies();
-}
-function stopExtraQRM(type){
-  if(type==='splatter')  { splatterHandle=null; }
-  if(type==='keyclicks') { keyclickHandle=null; }
-  if(type==='birdie')    {
-    birdieNodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
-    birdieNodes=[];
-  }
-}
-
-// Splatter: overmodulated adjacent-channel SSB station
-// Random burst 3–8 s interval, hard fast attack, broadband noise
-function startSplatter(){
-  const token = {};
-  splatterHandle = token;
-  function doSplat(){
-    if(splatterHandle !== token) return;
-    if(!audioCtx || !contestVolGain){ setTimeout(doSplat, 2000); return; }
-    const bp = BAND_PROFILES[bandProfile] || BAND_PROFILES['20m'];
-    const interval = (3000 + Math.random()*5000) * bp.splatRate;
-    try{
-      const dur  = 0.3 + Math.random()*1.4;
-      const buf  = makeNoiseBuf('contest', Math.ceil(dur)+1);
-      const src  = audioCtx.createBufferSource(); src.buffer=buf;
-      const hp   = audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=200;
-      const lp   = audioCtx.createBiquadFilter(); lp.type='lowpass';  lp.frequency.value=3200;
-      // Peaking at ~1 kHz — classic voice/splatter shape
-      const peak = audioCtx.createBiquadFilter(); peak.type='peaking'; peak.frequency.value=950; peak.gain.value=8; peak.Q.value=1.1;
-      const g    = audioCtx.createGain(); g.gain.value=0;
-      const now  = audioCtx.currentTime;
-      const pk   = 0.14 + Math.random()*0.12;
-      // Hard attack (20ms), fast release — sounds like bad ALC
-      g.gain.setValueAtTime(0, now);
-      g.gain.linearRampToValueAtTime(pk, now+0.02);
-      g.gain.setValueAtTime(pk, now+dur-0.03);
-      g.gain.linearRampToValueAtTime(0, now+dur);
-      src.connect(hp); hp.connect(lp); lp.connect(peak); peak.connect(g);
-      g.connect(contestVolGain);
-      src.start(now); src.stop(now+dur+0.1);
-    }catch(e){}
-    setTimeout(doSplat, interval);
-  }
-  setTimeout(doSplat, 500 + Math.random()*1500);
-}
-
-// Key-clicks: hard square-wave CW keying → characteristic click-clack sound
-// Multiple "phantom" dits at random wpm in the band
-function startKeyClicks(){
-  const token = {};
-  keyclickHandle = token;
-  function doClick(){
-    if(keyclickHandle !== token) return;
-    if(!audioCtx || !contestVolGain){ setTimeout(doClick, 1500); return; }
-    const interval = 800 + Math.random()*2200;
-    try{
-      // A short dit-like burst with NO soft keying — instant on/off = clicks
-      const wpm  = 15 + Math.random()*20;
-      const ditMs= 1200/wpm;
-      const freq = 500 + Math.random()*600;
-      const osc  = audioCtx.createOscillator();
-      osc.type   = 'square';   // square wave → wide spectrum
-      osc.frequency.value = freq;
-      const g = audioCtx.createGain(); g.gain.value=0;
-      const lp= audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2000;
-      osc.connect(lp); lp.connect(g); g.connect(contestVolGain);
-      const now = audioCtx.currentTime;
-      const vol = 0.04 + Math.random()*0.06;
-      // INSTANT on/off — no ramp — creates the click
-      g.gain.setValueAtTime(vol, now);
-      g.gain.setValueAtTime(0, now + ditMs/1000);
-      osc.start(now); osc.stop(now + ditMs/1000 + 0.02);
-    }catch(e){}
-    setTimeout(doClick, interval);
-  }
-  setTimeout(doClick, Math.random()*800);
-}
-
-// Birdie: stable CW-like tone (receiver mixer product), very slow drift
-function startBirdies(){
-  if(!audioCtx) return;
-  // Stop previous birdies
-  birdieNodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
-  birdieNodes=[];
-  // 1–2 birdies at random audio frequencies
-  const numBirdies = 1 + Math.floor(Math.random()*2);
-  for(let bi=0; bi<numBirdies; bi++){
-    try{
-      const bFreq = 400 + Math.random()*2000;
-      const osc   = audioCtx.createOscillator();
-      osc.type    = 'sine';
-      osc.frequency.value = bFreq;
-      // Very slow drift: one tiny cycle over ~30 minutes → almost imperceptible wander
-      const driftOsc = audioCtx.createOscillator();
-      driftOsc.frequency.value = 0.0006 + Math.random()*0.0008;
-      const driftG = audioCtx.createGain();
-      driftG.gain.value = 0.6 + Math.random()*0.8;  // ±0.6–1.4 Hz max drift
-      driftOsc.connect(driftG);
-      driftG.connect(osc.frequency);
-      const g = audioCtx.createGain();
-      g.gain.value = 0.008 + Math.random()*0.008;   // very quiet — just audible
-      osc.connect(g); g.connect(masterGain);
-      osc.start(); driftOsc.start();
-      birdieNodes.push(osc, driftOsc, driftG, g);
-    }catch(e){}
-  }
 }
 
 function initAudio(){
@@ -1850,8 +1914,6 @@ function initAudio(){
     buildSSBChain();
     // Start all active noise modes
     activeNoiseModes.forEach(m=>startNoise(m));
-    // Restart extra QRM if user had them on before audio init
-    extraQRM.forEach(t=>startExtraQRM(t));
   }catch(e){console.warn('Audio init failed:',e);}
 }
 
@@ -2194,16 +2256,9 @@ function stopNoise(type){
 function stopAllNoise(){
   stopContestNoise();
   Object.keys(noiseNodes).forEach(t=>stopNoise(t));
-  // Extra QRM: stop ongoing scheduled bursts (tokens become stale automatically)
-  // Birdies must be explicitly stopped
-  birdieNodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
-  birdieNodes=[];
-  splatterHandle=null;
-  keyclickHandle=null;
 }
 function updateNoiseGains(){
-  const bp = BAND_PROFILES[bandProfile] || BAND_PROFILES['20m'];
-  Object.values(noiseNodes).forEach(n=>n.g.gain.value=n.cfg.bvol*(qrnLevel/50)*bp.noiseFloor);
+  Object.values(noiseNodes).forEach(n=>n.g.gain.value=n.cfg.bvol*(qrnLevel/50));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2224,34 +2279,6 @@ let cwSpeed=20, cwTone=600, cwMode='calls';
 let cwExpected='', cwPlaying=false;
 let cwInterferenceNodes=[];
 
-// ── CW REALISM — Chirp & Drift ──────────────────────────────────────
-let cwChirpEnabled = false;   // freq shift at element start
-let cwDriftEnabled = false;   // slow VFO wander
-let cwDriftOffset  = 0;       // current drift Hz (updated by timer)
-let cwDriftTimer   = null;
-
-function toggleCWChirp(){
-  cwChirpEnabled = !cwChirpEnabled;
-  const b = document.getElementById('cw-chirp-btn');
-  if(b) b.classList.toggle('on', cwChirpEnabled);
-}
-function toggleCWDrift(){
-  cwDriftEnabled = !cwDriftEnabled;
-  const b = document.getElementById('cw-drift-btn');
-  if(b) b.classList.toggle('on', cwDriftEnabled);
-  if(cwDriftEnabled){
-    cwDriftOffset = 0;
-    if(!cwDriftTimer) cwDriftTimer = setInterval(()=>{
-      if(!cwDriftEnabled){ cwDriftOffset=0; return; }
-      // Slow random walk: ±15 Hz max, 0.3 Hz steps
-      cwDriftOffset += (Math.random()-0.5)*0.6;
-      cwDriftOffset = Math.max(-15, Math.min(15, cwDriftOffset));
-    }, 200);
-  } else {
-    cwDriftOffset=0;
-  }
-}
-
 function getCWTiming(wpm){
   const dot=1200/wpm;
   return{dot,dash:dot*3,elemGap:dot,charGap:dot*3,wordGap:dot*7};
@@ -2271,17 +2298,7 @@ function playCWChar(char,wpm,tone,amplitude){
         const osc=audioCtx.createOscillator();
         const g=audioCtx.createGain();
         osc.connect(g);g.connect(masterGain);
-        osc.type='sine';
-        // Chirp: frequency starts higher and settles — characteristic of vintage rigs
-        const chirpHz = cwChirpEnabled ? (6 + Math.random()*12) : 0;
-        const driftHz = cwDriftEnabled ? cwDriftOffset : 0;
-        const baseTone = tone + driftHz;
-        if(chirpHz > 0){
-          osc.frequency.setValueAtTime(baseTone + chirpHz, time);
-          osc.frequency.linearRampToValueAtTime(baseTone, time + 0.006);
-        } else {
-          osc.frequency.setValueAtTime(baseTone, time);
-        }
+        osc.frequency.value=tone;osc.type='sine';
         // Smooth keying - 5ms rise/fall prevents clicks
         g.gain.setValueAtTime(0,time);
         g.gain.linearRampToValueAtTime(amplitude,time+0.005);
@@ -2535,7 +2552,346 @@ let mainSpeaking = false;
 // Fallback: if MediaStreamDestination fails (some browsers), route direct.
 // QSB: a GainNode before the chain is animated with a per-call LFO.
 // ═══════════════════════════════════════════════════════════════════
+// ELEVENLABS TTS ENGINE
+// ═══════════════════════════════════════════════════════════════════
+const EL_API = 'https://api.elevenlabs.io/v1';
+// Accent slots available for voice mapping
+const EL_ACCENTS = [
+  {key:'us',  flag:'🇺🇸', label:'USA  (W/K/N/AA…)'},
+  {key:'gb',  flag:'🇬🇧', label:'UK   (G/M/2E…)'},
+  {key:'au',  flag:'🇦🇺', label:'AUS  (VK…)'},
+  {key:'ca',  flag:'🇨🇦', label:'CAN  (VE/VA…)'},
+  {key:'eu',  flag:'🇪🇺', label:'EU   (DL/OE/F/I…)'},
+  {key:'in',  flag:'🇮🇳', label:'IND  (VU/AT…)'},
+  {key:'za',  flag:'🇿🇦', label:'ZAF  (ZS…)'},
+  {key:'other',flag:'🌐', label:'Rest'},
+];
+
+let elCfg = {enabled:false, key:'', model:'eleven_turbo_v2_5', voiceMap:{}};
+let elVoices = [];             // [{voice_id, name, category, labels}]
+let elCurrentSrc = null;       // active AudioBufferSourceNode
+const elAudioCache = new Map();// 'voiceId|text' → AudioBuffer
+
+function elLoad(){
+  try{
+    const d = JSON.parse(localStorage.getItem('hfct_el')||'{}');
+    if(d.key)       elCfg.key      = d.key;
+    if(d.model)     elCfg.model    = d.model;
+    if(d.enabled)   elCfg.enabled  = true;
+    if(d.voiceMap)  elCfg.voiceMap = d.voiceMap;
+    const vc = localStorage.getItem('hfct_el_voices');
+    if(vc) elVoices = JSON.parse(vc);
+    // Restore key input if overlay already rendered
+    const ki = document.getElementById('el-key-input');
+    if(ki && elCfg.key) ki.value = elCfg.key;
+    const ms = document.getElementById('el-model');
+    if(ms) ms.value = elCfg.model;
+    if(elCfg.enabled){
+      const st = document.getElementById('el-status');
+      if(st) st.textContent = '✅ Verbunden (gecachte Stimmen: '+elVoices.length+')';
+    }
+  }catch(e){}
+}
+
+function elSave(){
+  try{
+    localStorage.setItem('hfct_el', JSON.stringify(
+      {key:elCfg.key, model:elCfg.model, enabled:elCfg.enabled, voiceMap:elCfg.voiceMap}
+    ));
+    if(elVoices.length)
+      localStorage.setItem('hfct_el_voices',
+        JSON.stringify(elVoices.map(v=>({voice_id:v.voice_id,name:v.name,category:v.category,labels:v.labels||{}}))));
+  }catch(e){}
+}
+
+// Voice ID for a given accent (fallback chain: accent → us → any)
+function elVoiceForAccent(accent){
+  return elCfg.voiceMap[accent]
+      || elCfg.voiceMap['us']
+      || Object.values(elCfg.voiceMap)[0]
+      || null;
+}
+
+async function elConnect(){
+  const keyInput = document.getElementById('el-key-input');
+  const statusEl = document.getElementById('el-status');
+  if(!keyInput||!statusEl) return;
+  const key = keyInput.value.trim();
+  if(!key){ statusEl.textContent='⚠ Bitte API-Key eingeben'; return; }
+  statusEl.textContent = '⏳ Verbinde…';
+  try{
+    const r = await fetch(`${EL_API}/user`, {
+      headers:{'xi-api-key':key, 'Accept':'application/json'}
+    });
+    if(!r.ok) throw new Error('Ungültiger Key (HTTP '+r.status+')');
+    const user = await r.json();
+    elCfg.key = key;
+    elCfg.enabled = true;
+    await elFetchVoices(key);
+    const used  = user.subscription?.character_count || 0;
+    const limit = user.subscription?.character_limit  || 10000;
+    const tier  = user.subscription?.tier || 'free';
+    statusEl.innerHTML = `✅ Verbunden (${tier}) · <strong>${(limit-used).toLocaleString()}</strong> Zeichen verbleibend`;
+    elSave();
+    vlRefreshELVoices();
+  }catch(e){
+    statusEl.textContent = '❌ '+e.message;
+    elCfg.enabled = false;
+  }
+}
+
+async function elFetchVoices(key){
+  const r = await fetch(`${EL_API}/voices`, {
+    headers:{'xi-api-key': key||elCfg.key, 'Accept':'application/json'}
+  });
+  if(!r.ok) throw new Error('Voices: HTTP '+r.status);
+  const d = await r.json();
+  elVoices = (d.voices||[]).filter(v=>v.voice_id&&v.name);
+  elSave();
+}
+
+function elDisconnect(){
+  elCfg = {enabled:false, key:'', model:'eleven_turbo_v2_5', voiceMap:{}};
+  elVoices = []; elAudioCache.clear();
+  try{ localStorage.removeItem('hfct_el'); localStorage.removeItem('hfct_el_voices'); }catch(e){}
+  const ki = document.getElementById('el-key-input');
+  if(ki) ki.value = '';
+  const st = document.getElementById('el-status');
+  if(st) st.textContent = 'Getrennt';
+  vlRefreshELVoices();
+}
+
+function elSetModel(model){
+  elCfg.model = model;
+  elAudioCache.clear(); // invalidate on model change
+  elSave();
+}
+
+function elCancelCurrent(){
+  if(elCurrentSrc){ try{ elCurrentSrc.stop(); }catch(e){} elCurrentSrc=null; }
+}
+
+async function elFetchAudioBuffer(voiceId, text){
+  if(!audioCtx) initAudio();
+  const ck = voiceId+'|'+text;
+  if(elAudioCache.has(ck)) return elAudioCache.get(ck);
+  const r = await fetch(`${EL_API}/text-to-speech/${voiceId}`, {
+    method:'POST',
+    headers:{'xi-api-key':elCfg.key, 'Content-Type':'application/json', 'Accept':'audio/mpeg'},
+    body: JSON.stringify({
+      text, model_id: elCfg.model,
+      voice_settings:{stability:0.48, similarity_boost:0.75, style:0.0, use_speaker_boost:true}
+    })
+  });
+  if(!r.ok) throw new Error('EL TTS HTTP '+r.status);
+  const arr = await r.arrayBuffer();
+  const buf = await audioCtx.decodeAudioData(arr.slice(0));
+  if(elAudioCache.size >= 280) elAudioCache.delete(elAudioCache.keys().next().value);
+  elAudioCache.set(ck, buf);
+  return buf;
+}
+
+function elPlayBuffer(buf, call, cb){
+  if(!audioCtx) initAudio();
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  let endNode = masterGain;
+  // Route through SSB chain if active (same as Web Speech path)
+  if(ssbChain && rfFiltLevel > 0){
+    try{
+      const qsbGain = audioCtx.createGain();
+      const qsbFn   = call ? getQSBForCall(call) : null;
+      const useQSB  = qsbFn && (difficulty==='medium'||difficulty==='ck') && rfFiltLevel>=2;
+      qsbGain.gain.value = useQSB ? qsbFn() : 1.0;
+      ckProtectGain = audioCtx.createGain(); ckProtectGain.gain.value = 1.0;
+      src.connect(qsbGain); qsbGain.connect(ckProtectGain); ckProtectGain.connect(ssbChain.input);
+      ssbChain.output.connect(masterGain);
+      endNode = ssbChain.output;
+      if(useQSB) startQSBLFO(qsbGain, qsbFn);
+    }catch(e){ src.connect(masterGain); endNode = masterGain; }
+  } else {
+    src.connect(masterGain);
+  }
+  masterGain.gain.value = vol/100;
+  src.onended = ()=>{
+    stopQSBLFO(); mainSpeaking = false;
+    if(difficulty==='ck') Object.values(noiseNodes).forEach(n=>{
+      try{ n.g.gain.setTargetAtTime(n.cfg.bvol*(qrnLevel/50), audioCtx.currentTime, 0.4); }catch(e){}
+    });
+    if(cb) cb();
+  };
+  elCurrentSrc = src; mainSpeaking = true; src.start();
+}
+
+async function elSpeak(text, call, cb){
+  const accent  = accentForCall(call||'');
+  const voiceId = elVoiceForAccent(accent);
+  if(!voiceId){ speakNative(text, call, cb); return; }
+  lastAudio = text;
+  const vObj = elVoices.find(v=>v.voice_id===voiceId);
+  document.getElementById('voice-tag').textContent = '🤖 '+(vObj ? vObj.name.split(' ')[0] : 'EL');
+  if(difficulty==='ck') Object.values(noiseNodes).forEach(n=>{
+    try{ n.g.gain.setTargetAtTime(n.cfg.bvol*(qrnLevel/50)*0.45, audioCtx.currentTime, 0.3); }catch(e){}
+  });
+  try{
+    const buf = await elFetchAudioBuffer(voiceId, text);
+    elCancelCurrent(); elPlayBuffer(buf, call, cb);
+  }catch(e){
+    console.warn('EL speak failed — fallback to native TTS:', e);
+    speakNative(text, call, cb);
+  }
+}
+
+// Background prefetch — fires and forgets, fills cache before needed
+function elPrefetch(text, call){
+  if(!elCfg.enabled || !elCfg.key) return;
+  const voiceId = elVoiceForAccent(accentForCall(call||''));
+  if(!voiceId) return;
+  const ck = voiceId+'|'+text;
+  if(!elAudioCache.has(ck)) elFetchAudioBuffer(voiceId, text).catch(()=>{});
+}
+
+// ── Voice Lab helpers ──────────────────────────────────────────────
+function vlTab(tab){
+  document.getElementById('vl-tab-el').style.display  = tab==='el'  ? '' : 'none';
+  document.getElementById('vl-tab-sys').style.display = tab==='sys' ? '' : 'none';
+  document.getElementById('vlt-el').className  = 'lb-tab'+(tab==='el' ?' on':'');
+  document.getElementById('vlt-sys').className = 'lb-tab'+(tab==='sys'?' on':'');
+  if(tab==='el')  { elLoad(); vlRefreshELVoices(); }
+  if(tab==='sys') { vlRefreshSysVoices(); }
+}
+
+function vlRefreshELVoices(){
+  const mapDiv = document.getElementById('el-voice-map');
+  if(!mapDiv) return;
+  mapDiv.innerHTML = '';
+  const opts = elVoices.length
+    ? '<option value="">— nicht zugewiesen —</option>'
+      + elVoices.map(v=>`<option value="${v.voice_id}">${v.name}${v.category?'  ('+v.category+')':''}</option>`).join('')
+    : '<option value="">— erst verbinden —</option>';
+
+  EL_ACCENTS.forEach(({key, flag, label})=>{
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px';
+    const assigned = elCfg.voiceMap[key]||'';
+    row.innerHTML = `
+      <span style="font-size:14px;flex-shrink:0">${flag}</span>
+      <span style="font-size:9px;color:var(--txt2);font-family:var(--fmono);width:130px;flex-shrink:0">${label}</span>
+      <select style="flex:1;font-size:9px;padding:3px 6px" onchange="elSetVoiceMap('${key}',this.value)">${opts}</select>
+      <button onclick="elTestVoice('${key}')" style="font-size:9px;padding:3px 8px;border:1px solid rgba(255,255,255,.14);background:transparent;color:var(--txt2);border-radius:4px;cursor:pointer;white-space:nowrap;font-family:var(--fui)" title="Test">▶</button>
+    `;
+    // Set current selection
+    const sel = row.querySelector('select');
+    if(sel) sel.value = assigned;
+    mapDiv.appendChild(row);
+  });
+}
+
+function elSetVoiceMap(accent, voiceId){
+  if(voiceId) elCfg.voiceMap[accent] = voiceId;
+  else delete elCfg.voiceMap[accent];
+  elSave();
+}
+
+function elTestVoice(accent){
+  const voiceId = elCfg.voiceMap[accent];
+  if(!voiceId || !elCfg.key){ addLine('⚠ Keine Stimme für diesen Akzent zugewiesen.','sys'); return; }
+  const phrases = {
+    dl3ab:'Delta Lima Three Alpha Bravo, five nine, Contest',
+    oe5:'Oscar Echo Five X-ray Lima Mike, five nine fourteen',
+    cq:'CQ Contest, CQ Contest, Delta Lima Three Alpha Bravo',
+    dx:'Victor Kilo Nine X-ray, five nine, zone three',
+  };
+  const sel = document.getElementById('vl-phrase');
+  const txt = phrases[sel ? sel.value : 'dl3ab'] || phrases.dl3ab;
+  if(!audioCtx) initAudio();
+  elFetchAudioBuffer(voiceId, txt)
+    .then(buf=>{ elCancelCurrent(); elPlayBuffer(buf, null, ()=>{}); })
+    .catch(e=>{ addLine('❌ EL Test: '+e.message,'sys'); });
+}
+
+function vlRefreshSysVoices(){
+  // (existing showVoiceLab logic, now called only for sys tab)
+  const all = window.speechSynthesis.getVoices();
+  const en  = all.filter(v=>v.lang&&v.lang.startsWith('en'));
+  const poolInfo = document.getElementById('vl-pool-info');
+  if(poolInfo){
+    const cats=[
+      {lbl:'🇺🇸',n:en.filter(v=>v.lang==='en-US'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🇬🇧',n:en.filter(v=>v.lang==='en-GB'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🇦🇺',n:en.filter(v=>v.lang==='en-AU'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🇨🇦',n:en.filter(v=>v.lang==='en-CA'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🇮🇳',n:en.filter(v=>v.lang==='en-IN'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🇿🇦',n:en.filter(v=>v.lang==='en-ZA'&&QUALITY_NAMES.some(q=>v.name.toLowerCase().includes(q))).length},
+      {lbl:'🌐 Pool',n:voicePool.length},
+    ];
+    poolInfo.innerHTML='<div style="font-size:8px;font-weight:700;letter-spacing:1.5px;color:var(--txt3);font-family:var(--fui);margin-bottom:5px">GEFUNDENE QUALITÄTSSTIMMEN</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px">'
+      +cats.map(c=>`<span style="font-family:var(--fmono);font-size:9px;color:${c.n>0?'var(--acc)':'var(--txt3)'};">${c.lbl} <strong>${c.n}</strong></span>`).join('')+'</div>';
+  }
+  const fd=document.getElementById('vl-found'); if(fd) fd.textContent=en.length+' Stimmen';
+  document.getElementById('vl-favonly').checked=vlFavOnly;
+  const BLOCKED=VOICE_BLOCKED;
+  const isBlocked=nm=>BLOCKED.some(b=>nm.includes(b));
+  vlLoadFavs();
+  const sorted=[...en].sort((a,b)=>{
+    const af=vlFavSet.has(a.name)?0:1, bf=vlFavSet.has(b.name)?0:1;
+    if(af!==bf) return af-bf;
+    const aq=vlQuality(a)==='premium'?0:vlQuality(a)==='neural'?1:2;
+    const bq=vlQuality(b)==='premium'?0:vlQuality(b)==='neural'?1:2;
+    return aq!==bq?aq-bq:a.name.localeCompare(b.name);
+  });
+  const listDiv=document.getElementById('vl-list');
+  if(!listDiv) return;
+  listDiv.innerHTML='';
+  function makeRow(v){
+    const q=vlQuality(v),blk=isBlocked(v.name.toLowerCase()),isFav=vlFavSet.has(v.name);
+    const row=document.createElement('div'); row.className='vl-row';
+    if(blk) row.style.opacity='.35';
+    row.innerHTML=`<button class="vl-fav${isFav?' on':''}" data-vname="${v.name.replace(/"/g,'&quot;')}" onclick="vlToggleFav('${v.name.replace(/'/g,"\\'")}')" title="Favorit">${isFav?'★':'☆'}</button>
+      <div class="vl-name" title="${v.name}">${v.name}</div>
+      <div class="vl-lang">${(v.lang||'?').slice(0,5)}</div>
+      <span class="vl-badge ${q}">${q}</span>
+      ${blk?'<span style="font-size:7px;color:var(--red)">BLOCKED</span>':`<button class="vl-test" onclick="vlTestSysVoice('${v.name.replace(/'/g,"\\'")}')" title="Test">▶ Test</button>`}`;
+    return row;
+  }
+  const favs=sorted.filter(v=>vlFavSet.has(v.name)), others=sorted.filter(v=>!vlFavSet.has(v.name));
+  if(favs.length){ const h=document.createElement('div'); h.className='vl-section'; h.textContent='★ Favoriten'; listDiv.appendChild(h); favs.forEach(v=>listDiv.appendChild(makeRow(v))); }
+  if(others.length){ const h=document.createElement('div'); h.className='vl-section'; h.textContent=others.length+' weitere'; listDiv.appendChild(h); others.forEach(v=>listDiv.appendChild(makeRow(v))); }
+  if(!en.length){ const e=document.createElement('div'); e.className='vl-empty'; e.textContent='Keine Stimmen — Browser-TTS aktivieren.'; listDiv.appendChild(e); }
+}
+
+function vlTestSysVoice(name){
+  try{
+    window.speechSynthesis.cancel();
+    const all=window.speechSynthesis.getVoices(), v=all.find(x=>x.name===name);
+    if(!v) return;
+    const phrases={dl3ab:'Delta Lima Three Alpha Bravo, five nine, Contest',oe5:'Oscar Echo Five X-ray Lima Mike, five nine fourteen',cq:'CQ Contest CQ Contest Delta Lima Three Alpha Bravo',dx:'Victor Kilo Nine X-ray, five nine, zone three'};
+    const sel=document.getElementById('vl-phrase-sys');
+    const u=new SpeechSynthesisUtterance(phrases[sel?sel.value:'dl3ab']||phrases.dl3ab);
+    u.voice=v; u.rate=1.0; u.pitch=1.0; u.volume=0.92;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function showVoiceLab(){
+  elLoad();
+  document.getElementById('vl-ov').style.display='flex';
+  vlTab('el');  // open on EL tab by default
+}
+
+// ── End ElevenLabs Engine ──────────────────────────────────────────
+
 function speak(text, call, cb){
+  // ── ElevenLabs branch — takes priority when connected & voice mapped ──
+  if(elCfg.enabled && elCfg.key && elVoiceForAccent(accentForCall(call||''))){
+    elSpeak(text, call, cb);
+    return;
+  }
+  speakNative(text, call, cb);
+}
+
+function speakNative(text, call, cb){
   try{
     if(!window.speechSynthesis){if(cb)cb();return;}
     lastAudio=text;
@@ -2656,7 +3012,7 @@ function speak(text, call, cb){
       }catch(e){mainUtterance=null;mainSpeaking=false;if(cb)cb();}
     },80);
   }catch(e){if(cb)cb();}
-}  // end speak
+}  // end speakNative
 
 // QSB LFO animator – runs on rAF, updates the qsbGain continuously
 // In CK mode: also drives a protect gain that counters QSB dips
@@ -2771,7 +3127,7 @@ function wfRebuildSignals() {
   wfSignals.push({
     id: wfSignalId++, freqOff: 0, strength: mainStr, bw: mainBW,
     type: appMode === 'cw' ? 'cw' : 'main',
-    label: curQSO ? curQSO.call : '',
+    label: curQSO ? (blindMode ? '???' : curQSO.call) : '',
     qsbFreq: 0.08, qsbDepth: difficulty === 'easy' ? 0.08 : 0.28, qsbPhase: 0,
   });
 
@@ -3810,8 +4166,6 @@ function updAdapt(ok, cat) {
   adapt.xp += (ok ? (difficulty==='ck'?15:difficulty==='medium'?8:4) : 1);
   adapt.total++; if(!ok) adapt.busts++;
   adapt.lastTime = Date.now();
-  // Feed auto-adapt progress curve
-  autoAdaptPush(ok);
 
   // Elo update
   if (cat) {
@@ -3859,130 +4213,6 @@ function buildAdaptHint(lastOk) {
   }
   if (!lastOk) return '✗ '+Math.round(acc*100)+'%';
   return '● '+Math.round(acc*100)+'% · Elo: '+Math.round(cats.reduce((s,c)=>(s+(elo[c]?.rating||ELO_DEFAULT)),0)/cats.length);
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// AUTO-ADAPT PROGRESS CURVE
-// Tracks rolling hit-rate over last 10 QSOs and smoothly adjusts
-// pile density, RF filter hardness, QSB depth, and noise levels.
-// Level 0–10 maps: 0–3 easy, 3–6 medium, 6–10 contest-hard
-// ═══════════════════════════════════════════════════════════════════
-let autoAdaptEnabled = false;
-let autoAdaptHistory = [];   // last 10 results: 1=correct, 0=wrong
-let autoAdaptLevel   = 2.0;  // float 0–10, starts in easy zone
-const AA_WINDOW = 10;        // rolling window size
-const AA_CHECK  = 5;         // check every N QSOs
-
-function toggleAutoAdapt(){
-  autoAdaptEnabled = !autoAdaptEnabled;
-  const btn  = document.getElementById('btn-autoadapt');
-  const icon = document.getElementById('autoadapt-icon');
-  if(btn){
-    btn.style.color    = autoAdaptEnabled ? 'var(--acc)' : 'var(--txt2)';
-    btn.style.borderColor = autoAdaptEnabled ? 'var(--acc)' : 'rgba(255,255,255,.12)';
-    btn.style.background  = autoAdaptEnabled ? 'rgba(74,158,255,.1)' : 'rgba(255,255,255,.04)';
-  }
-  if(icon) icon.textContent = autoAdaptEnabled ? '●' : '○';
-  if(autoAdaptEnabled){
-    // Reset history, start from current difficulty level
-    autoAdaptHistory = [];
-    autoAdaptLevel = difficulty==='ck' ? 7.0 : difficulty==='medium' ? 4.0 : 2.0;
-    autoAdaptUpdateUI();
-  } else {
-    const lv = document.getElementById('autoadapt-lv');
-    const bar= document.getElementById('autoadapt-bar');
-    if(lv)  lv.textContent  = '';
-    if(bar) bar.style.width = '0%';
-  }
-}
-
-function autoAdaptPush(ok){
-  if(!autoAdaptEnabled) return;
-  autoAdaptHistory.push(ok ? 1 : 0);
-  if(autoAdaptHistory.length > AA_WINDOW) autoAdaptHistory.shift();
-  // Only adjust every AA_CHECK QSOs
-  if(autoAdaptHistory.length < 3) return;
-  if((autoAdaptHistory.length % AA_CHECK) !== 0) return;
-
-  const hitRate = autoAdaptHistory.reduce((s,v)=>s+v,0) / autoAdaptHistory.length;
-
-  let delta = 0;
-  if(hitRate >= 0.85) delta = +0.6;        // doing very well → step up
-  else if(hitRate >= 0.72) delta = +0.25;  // good → gentle step up
-  else if(hitRate <= 0.40) delta = -0.8;   // struggling → step down
-  else if(hitRate <= 0.55) delta = -0.3;   // below average → gentle step down
-
-  if(delta !== 0){
-    autoAdaptLevel = Math.max(0.2, Math.min(9.8, autoAdaptLevel + delta));
-    autoAdaptApply();
-  }
-  autoAdaptUpdateUI();
-}
-
-function autoAdaptApply(){
-  const lv = autoAdaptLevel;
-
-  // ── Pile count ─────────────────────────────────────────
-  pileCount = lv < 2.5 ? 1 : lv < 4.5 ? 2 : lv < 6.5 ? 3 : lv < 8 ? 4 : 5;
-  const ds = document.getElementById('s-pile-density');
-  if(ds){ pileDensity = pileCount + 2; ds.value = pileDensity; }
-  const dv = document.getElementById('v-pile-density');
-  if(dv) dv.textContent = String(pileDensity);
-
-  // ── RF filter ──────────────────────────────────────────
-  rfFiltLevel = Math.round(1 + lv * 0.85);  // 1–9.5 across 0–10
-  rfFiltLevel = Math.max(1, Math.min(10, rfFiltLevel));
-  const fs = document.getElementById('s-rfilt');
-  if(fs) fs.value = rfFiltLevel;
-  const fv = document.getElementById('v-rfilt');
-  if(fv) fv.textContent = rfFiltLevel;
-  if(audioCtx) buildSSBChain();
-  updateRFiltLabel();
-
-  // ── Noise profile ──────────────────────────────────────
-  if(lv < 3){
-    // Easy zone: only base band noise
-    activeNoiseModes = new Set(['band']);
-    if(audioCtx){ stopAllNoise(); startNoise('band'); }
-  } else if(lv < 6){
-    // Medium zone: band + contest
-    activeNoiseModes = new Set(['band','contest']);
-    if(audioCtx){ stopAllNoise(); ['band','contest'].forEach(m=>startNoise(m)); }
-  } else {
-    // Hard zone: band + contest + fading
-    activeNoiseModes = new Set(['band','contest','fading']);
-    if(audioCtx){ stopAllNoise(); ['band','contest','fading'].forEach(m=>startNoise(m)); }
-  }
-  ['band','contest','storm','aurora','fading'].forEach(t=>{
-    const b = document.getElementById('nb-'+t);
-    if(b) b.classList.toggle('on', activeNoiseModes.has(t));
-  });
-
-  // ── Contest volume ──────────────────────────────────────
-  if(lv >= 3){
-    const cv = Math.round(15 + (lv-3) * 5);  // 15–50
-    setContestVol(cv);
-    const cvs = document.getElementById('s-contestvol');
-    if(cvs) cvs.value = cv;
-  }
-
-  // ── Difficulty badge text ──────────────────────────────
-  const zone = lv < 3 ? 'EASY' : lv < 6 ? 'MEDIUM' : 'HARD';
-  const col  = lv < 3 ? 'var(--acc2)' : lv < 6 ? 'var(--acc)' : 'var(--red)';
-  const bbar = document.getElementById('bbar-diff');
-  if(bbar){ bbar.textContent = '● AUTO '+zone; bbar.style.color = col; }
-}
-
-function autoAdaptUpdateUI(){
-  const lv  = document.getElementById('autoadapt-lv');
-  const bar = document.getElementById('autoadapt-bar');
-  if(lv)  lv.textContent  = autoAdaptLevel.toFixed(1);
-  if(bar) bar.style.width = (autoAdaptLevel/10*100).toFixed(1)+'%';
-  // Colour the bar by zone
-  if(bar){
-    const col = autoAdaptLevel < 3 ? 'var(--acc2)' : autoAdaptLevel < 6 ? 'var(--acc)' : 'var(--red)';
-    bar.style.background = col;
-  }
 }
 
 // UTC clock - runs independently, bulletproof
@@ -4342,9 +4572,6 @@ function setAppMode(mode){
   inp.placeholder=mode==='ssb'?T('call_ph'):T('cw_ph');
   document.getElementById('bbar-mode').textContent=mode==='ssb'?'📻 SSB':'⚡ CW';
   if(mode==='cw') buildMorseVis();
-  // Show/hide CW realism panel
-  const cwRealSec = document.getElementById('cw-realism-sec');
-  if(cwRealSec) cwRealSec.style.display = mode==='cw' ? '' : 'none';
   // Restart contest noise with correct mode (SSB vs CW sound)
   if(activeNoiseModes.has('contest') && audioCtx){ startContestNoise(); }
   setDiff(difficulty);
@@ -4353,12 +4580,34 @@ function setAppMode(mode){
 // ═══════════════════════════════════════════════════════════════════
 // LINE HELPERS
 // ═══════════════════════════════════════════════════════════════════
+// ── BLIND MODE ──────────────────────────────────────────────────────
+let blindMode = false;
+function toggleBlindMode(){
+  blindMode = !blindMode;
+  const btn = document.getElementById('blind-toggle-btn');
+  if(blindMode){
+    btn.classList.add('blind-on');
+    btn.textContent = '🙈 BLIND';
+  } else {
+    btn.classList.remove('blind-on');
+    btn.textContent = '👁 BLIND';
+  }
+  // Re-render S&P panel so station buttons update immediately
+  if(typeof spRenderStationList === 'function') spRenderStationList();
+  // Update waterfall overlay
+  if(typeof wfUpdateOverlay === 'function') wfUpdateOverlay();
+}
+// ────────────────────────────────────────────────────────────────────
 function addLine(txt,cls){
   try{
     const id=appMode==='cw'?'cw-rxd':'rxd';
     const clsN=appMode==='cw'?'cwrl':'rl';
     const d=document.getElementById(id);
-    const l=document.createElement('div');l.className=clsN+' '+(cls||'');l.textContent=txt;
+    const l=document.createElement('div');l.className=clsN+' '+(cls||'');
+    if(blindMode && (cls==='cq'||cls==='pu')){
+      const sp=document.createElement('span');sp.className='blind-call';
+      sp.title='Hover zum Aufdecken';sp.textContent=txt;l.appendChild(sp);
+    }else{l.textContent=txt;}
     d.appendChild(l);d.scrollTop=d.scrollHeight;
     if(d.children.length>60) d.removeChild(d.firstChild);
   }catch(e){}
@@ -4427,7 +4676,8 @@ function spRenderStationList(){
     const btn = document.createElement('div');
     btn.className = 'sp-station' + (spActive && spActive.call===st.call ? ' sp-active' : '');
     const zoneInfo = (contest==='cqww') ? ' · Z'+st.zone : '';
-    btn.textContent = '📡 ' + st.call + zoneInfo;
+    if(blindMode){btn.textContent='📡 ???'+(contest==='cqww'?' · Z'+st.zone:'');}
+    else{btn.textContent = '📡 ' + st.call + zoneInfo;}
     btn.onclick = () => spTuneTo(idx);
     list.appendChild(btn);
   });
@@ -4447,7 +4697,7 @@ function spTuneTo(idx){
   showExPanel(false);
   document.getElementById('input-label').textContent = T('call_input');
   addLine('↓ Tune: '+st.call+' · CQ running','cq');
-  document.getElementById('cqst').textContent = 'Tune: '+st.call;
+  document.getElementById('cqst').textContent = blindMode ? 'Tune: ???' : 'Tune: '+st.call;
   // Update S&P station list highlighting
   spRenderStationList();
   // Rebuild waterfall highlighting tuned station
@@ -5677,15 +5927,11 @@ function startSess(){
   callPersonaMap.clear();
   callVoiceMap.clear();   // fresh voice assignments each session
   callQSBMap.clear();     // fresh QSB envelopes each session
-  // Restart any active extra-QRM sources (birdies, etc.)
-  if(audioCtx) extraQRM.forEach(t=>startExtraQRM(t));
   voicePoolIdx=0;         // restart round-robin
   Object.keys(accentVoiceIdx).forEach(k=>{ accentVoiceIdx[k]=0; }); // reset per-accent counters
   stopQSBLFO();           // stop any leftover LFO
   rxStartTime=null; lastQSOCat=null;  // reset reaction time
   window._ssbFallbackNotified=false;  // reset SSB fallback notice
-  autoAdaptHistory=[];                // fresh curve each session
-  if(autoAdaptEnabled) autoAdaptUpdateUI();
   // Show stop/pause, hide start
   document.getElementById('btn-start').style.display='none';
   document.getElementById('btn-stop').style.display='block';
@@ -6686,7 +6932,7 @@ function hideManual(){ document.getElementById('manual-ov').style.display='none'
 // ═══════════════════════════════════════════════════════════════════
 window.addEventListener('load',function(){
   try{
-    initWF();initRG();
+    initWF();initRG();elLoad();
     // UTC clock - started independently above
     // updClk();
     // setInterval(updClk,1000);
