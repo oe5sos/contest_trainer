@@ -2,7 +2,11 @@
 
 **A free, browser-based SSB & CW contest simulator for amateur radio operators.**
 
-Try it live: **https://oe5sos.github.io/contest_trainer/**
+Try it live: **https://www.longpath.at/trainer/**  
+Mirror: https://oe5sos.github.io/contest_trainer/
+
+Part of the [Longpath](https://github.com/OE5SOS/Longpath) station
+software by Martin Fischer, OE5SOS — and styled to match it.
 
 ## Features
 - Realistic SSB & CW contest simulation (pileup, QSB, QRM, waterfall)

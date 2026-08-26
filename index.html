@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HF Contest Trainer v6.23</title>
+<title>HF Contest Trainer v6.53</title>
 <style>
 /* ── APPLE SDR — Design System ── */
 :root{
-  --bg0:#08080f;--bg1:#0f0f1a;--bg2:#14141f;--bg3:#05050a;--bg4:#1a1a28;
-  --acc:#4a9eff;--acc2:#1a6fd4;--acc3:#ff453a;--acc4:#ffd60a;--red:#ff453a;--purple:#bf5af2;
-  --dim:rgba(255,255,255,.08);--dimb:rgba(255,255,255,.12);
-  --txt:rgba(255,255,255,.88);--txt2:rgba(255,255,255,.45);--txt3:rgba(255,255,255,.22);
+  --bg0:#08080a;--bg1:#0c0c0e;--bg2:#111113;--bg3:#000000;--bg4:#1a1a1e;
+  --acc:#4a7ba8;--acc2:#2f5c86;--acc3:#c25a5c;--acc4:#c2924f;--red:#c25a5c;--purple:#a07fa8;
+  --dim:#191a1d;--dimb:#26262b;
+  --txt:#dcdce1;--txt2:#909096;--txt3:#58585e;
   --fmono:'SF Mono','Menlo','Monaco','Courier New',monospace;
   --fhud:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
   --fui:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  --glow:none;--rad:10px;
+  --glow:none;--rad:8px;
 }
 /* ── THEME: LIGHT — weißer Hintergrund, Login-Farben ── */
 [data-theme="light"]{
   --bg0:#f5f7fb;--bg1:#ffffff;--bg2:#eef2f8;--bg3:#e6ecf4;--bg4:#dce4f0;
-  --acc:#1a6fd4;--acc2:#0d4ba0;--acc3:#c63a2f;--acc4:#a06600;--red:#c63a2f;--purple:#6a30a8;
+  --acc:#2f5c86;--acc2:#254a72;--acc3:#a86b6d;--acc4:#8a6a30;--red:#a86b6d;--purple:#7a5f82;
   --dim:rgba(26,111,212,.1);--dimb:rgba(26,111,212,.22);
   --txt:rgba(8,16,40,.88);--txt2:rgba(8,16,40,.55);--txt3:rgba(8,16,40,.38);
   --rad:10px;
@@ -35,8 +35,7 @@
 [data-theme="light"] .mode-tab{border-color:rgba(0,0,0,.12);background:rgba(0,0,0,.03);color:var(--txt3)}
 [data-theme="light"] .mode-tab.active-ssb{background:var(--dim);border-color:var(--dimb);color:var(--acc)}
 [data-theme="light"] .mode-tab.active-cw{background:rgba(106,48,168,.1);border-color:rgba(106,48,168,.35);color:var(--purple)}
-[data-theme="light"] .sp-toggle{border-color:rgba(0,0,0,.14);background:rgba(0,0,0,.03);color:var(--txt3)}
-[data-theme="light"] .sp-toggle.sp-on{background:rgba(198,58,47,.1);border-color:rgba(198,58,47,.45);color:var(--red)}
+[data-theme="light"] .sp-toggle.blind-on{background:rgba(198,58,47,.1);border-color:rgba(198,58,47,.45);color:var(--red)}
 [data-theme="light"] .hclock{color:var(--txt2)}
 [data-theme="light"] .mycall-badge{border-color:var(--dim)}
 [data-theme="light"] .lp,[data-theme="light"] .rp{background:#ffffff;border-color:rgba(0,0,0,.08)}
@@ -144,7 +143,6 @@
 [data-theme="light"] .zmap-cell.zm-worked{background:rgba(13,75,160,.1);border-color:rgba(13,75,160,.4)}
 [data-theme="light"] .sp-station{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:var(--txt3)}
 [data-theme="light"] .sp-station:hover{background:rgba(198,58,47,.08);border-color:rgba(198,58,47,.3);color:var(--red)}
-[data-theme="light"] .sp-station.sp-active{background:rgba(198,58,47,.15);border-color:rgba(198,58,47,.6);color:var(--red)}
 
 
 /* ─ Base ─ */
@@ -205,11 +203,27 @@ body{font-family:var(--fui);background:var(--bg0);color:var(--txt);display:flex;
 .wf-freq-scale{position:absolute;bottom:3px;left:0;right:0;display:flex;justify-content:space-between;padding:0 10px;pointer-events:none}
 .wf-freq-lbl{font-family:var(--fmono);font-size:8px;color:rgba(255,255,255,.18);letter-spacing:.3px}
 
+/* ─ Short viewports: shrink fixed-height elements so START stays visible ─ */
+@media(max-height:820px){
+  .wf-bar,.wf-wrap{height:60px}
+  .rxw{max-height:76px;min-height:40px}
+  .cw-rx-display{max-height:76px;min-height:40px}
+}
+@media(max-height:700px){
+  .hdr{height:42px}
+  .wf-bar,.wf-wrap{height:44px}
+  .rxw{max-height:56px}
+  .cw-rx-display{max-height:56px}
+  .cinput{font-size:16px;padding:5px 10px}
+  .ab-start,.ab-pause,.ab-stop{padding:8px 4px}
+}
+
 /* ─ Main layout ─ */
 .main{display:flex;flex:1;overflow:hidden}
 .lp{width:218px;background:var(--bg1);border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
 .lp::-webkit-scrollbar{width:3px}.lp::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-.cp{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:var(--bg0)}
+.cp{flex:1;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;min-width:0;background:var(--bg0)}
+.cp::-webkit-scrollbar{width:3px}.cp::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
 .rp{width:206px;background:var(--bg1);border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
 .rp::-webkit-scrollbar{width:3px}.rp::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
 .psec{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -238,6 +252,91 @@ select option{background:#1c1c2e;color:var(--txt)}
 .sr-lbl{font-size:9px;color:var(--txt3);width:38px;font-weight:600;letter-spacing:.5px;flex-shrink:0}
 .sr-val{font-size:9px;color:var(--txt2);width:26px;text-align:right;font-family:var(--fmono);font-variant-numeric:tabular-nums}
 input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;accent-color:var(--acc);cursor:pointer}
+
+/* ─ Auto-Adapt 45s Button ─ */
+.aa-wrap{display:flex;align-items:center;gap:7px;margin-top:5px}
+.aa-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:6px 8px;border-radius:8px;cursor:pointer;font-family:var(--fui);
+  font-size:9px;font-weight:700;letter-spacing:.7px;
+  border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);
+  color:var(--txt3);transition:all .18s;
+}
+.aa-btn:hover{border-color:rgba(255,255,255,.2);color:var(--txt2)}
+.aa-btn.on{
+  border-color:rgba(74,158,255,.5);background:rgba(74,158,255,.08);
+  color:var(--acc);
+}
+.aa-btn.on .aa-dot{background:var(--acc);box-shadow:0 0 5px var(--acc);animation:aa-pulse 1s ease-in-out infinite}
+.aa-dot{width:6px;height:6px;border-radius:50%;background:var(--txt3);flex-shrink:0;transition:background .2s}
+@keyframes aa-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* countdown arc */
+.aa-countdown{
+  position:relative;width:26px;height:26px;flex-shrink:0;
+}
+.aa-countdown svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.aa-countdown-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fmono);font-size:7px;font-weight:700;color:var(--acc);line-height:1;
+}
+.aa-countdown.hidden{display:none}
+/* light theme */
+[data-theme="light"] .aa-btn{border-color:rgba(0,0,0,.12);background:rgba(0,0,0,.02);color:var(--txt3)}
+[data-theme="light"] .aa-btn:hover{border-color:rgba(0,0,0,.22);color:var(--txt2)}
+[data-theme="light"] .aa-btn.on{border-color:rgba(26,111,212,.5);background:rgba(26,111,212,.07);color:var(--acc)}
+
+/* ─ Difficulty Preset Cards ─ */
+.diff-preset-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:2px}
+.diff-preset-card{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:8px 4px 7px;border-radius:9px;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);
+  transition:all .18s cubic-bezier(.4,0,.2,1);text-align:center;
+}
+.diff-preset-card:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+.diff-preset-card.active{border-width:1.5px}
+.diff-preset-card::before{
+  content:'';position:absolute;inset:0;opacity:0;
+  background:var(--card-glow);transition:opacity .25s;pointer-events:none;
+}
+.diff-preset-card:hover::before,.diff-preset-card.active::before{opacity:1}
+/* EASY — grün */
+.diff-preset-card.easy{--card-glow:radial-gradient(ellipse at 50% 0%, rgba(0,212,100,.15) 0%, transparent 70%)}
+.diff-preset-card.easy.active{border-color:rgba(0,212,100,.55);background:rgba(0,212,100,.06)}
+.diff-preset-card.easy .dpc-icon{color:#6fa384}
+.diff-preset-card.easy.active .dpc-name{color:#6fa384}
+/* ADVANCED — blau */
+.diff-preset-card.advanced{--card-glow:radial-gradient(ellipse at 50% 0%, rgba(74,158,255,.15) 0%, transparent 70%)}
+.diff-preset-card.advanced.active{border-color:rgba(74,158,255,.55);background:rgba(74,158,255,.07)}
+.diff-preset-card.advanced .dpc-icon{color:var(--acc)}
+.diff-preset-card.advanced.active .dpc-name{color:var(--acc)}
+/* CONTEST KING — gold */
+.diff-preset-card.ck{--card-glow:radial-gradient(ellipse at 50% 0%, rgba(255,214,10,.18) 0%, transparent 70%)}
+.diff-preset-card.ck.active{border-color:rgba(255,214,10,.55);background:rgba(255,214,10,.06)}
+.diff-preset-card.ck .dpc-icon{color:var(--acc4)}
+.diff-preset-card.ck.active .dpc-name{color:var(--acc4)}
+.dpc-icon{font-size:15px;line-height:1;transition:transform .18s}
+.diff-preset-card:hover .dpc-icon{transform:scale(1.12)}
+.dpc-name{font-family:var(--fui);font-weight:700;font-size:8px;letter-spacing:.8px;color:var(--txt2);transition:color .18s;margin-top:1px}
+.dpc-sub{font-family:var(--fmono);font-size:7px;color:var(--txt3);letter-spacing:.3px;line-height:1.4;margin-top:2px}
+.dpc-badge{
+  position:absolute;top:4px;right:4px;
+  font-family:var(--fui);font-size:6px;font-weight:700;letter-spacing:.5px;
+  padding:1px 4px;border-radius:3px;
+}
+.diff-preset-card.easy .dpc-badge{background:rgba(0,212,100,.15);color:#6fa384}
+.diff-preset-card.advanced .dpc-badge{background:rgba(74,158,255,.15);color:var(--acc)}
+.diff-preset-card.ck .dpc-badge{background:rgba(255,214,10,.15);color:var(--acc4)}
+/* Light theme overrides for preset cards */
+[data-theme="light"] .diff-preset-card{border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.02)}
+[data-theme="light"] .diff-preset-card:hover{border-color:rgba(0,0,0,.2)}
+[data-theme="light"] .diff-preset-card.easy.active{border-color:rgba(0,160,80,.5);background:rgba(0,160,80,.06)}
+[data-theme="light"] .diff-preset-card.advanced.active{border-color:rgba(26,111,212,.5);background:rgba(26,111,212,.07)}
+[data-theme="light"] .diff-preset-card.ck.active{border-color:rgba(160,102,0,.5);background:rgba(160,102,0,.06)}
+/* Locked state during session */
+.diff-preset-sec-locked .diff-preset-card{opacity:.4;cursor:not-allowed;pointer-events:none}
+.diff-preset-sec-locked .diff-preset-card.active{opacity:.7}
 
 /* ─ Difficulty ─ */
 .diff-btns{display:flex;flex-direction:column;gap:4px}
@@ -276,18 +375,13 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 .morse-dot.lit,.morse-dash.lit{opacity:1}
 
 
-/* ── S&P MODE BUTTON ── */
+/* ── TOOLBAR BUTTONS ── */
 .sp-toggle{padding:5px 14px;font-size:10px;font-family:var(--fui);font-weight:600;letter-spacing:1px;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--txt3);border-radius:20px;transition:all .15s;text-transform:uppercase}
-.sp-toggle.sp-on{background:rgba(255,149,0,.12);border-color:rgba(255,149,0,.5);color:var(--acc3)}
 /* ── BLIND MODE ── */
 .blind-call{filter:blur(5px);user-select:none;transition:filter .3s;cursor:pointer}
 .blind-call:hover{filter:blur(0px)}
 .sp-toggle.blind-on{background:rgba(255,69,58,.12);border-color:rgba(255,69,58,.5);color:var(--red)}
 [data-theme="light"] .sp-toggle.blind-on{background:rgba(198,58,47,.1);border-color:rgba(198,58,47,.45);color:var(--red)}
-.sp-station{padding:4px 8px;font-size:9px;font-family:var(--fmono);cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--txt3);border-radius:6px;transition:all .12s;white-space:nowrap;letter-spacing:.5px}
-.sp-station:hover{background:rgba(255,149,0,.1);border-color:rgba(255,149,0,.3);color:var(--acc3)}
-.sp-station.sp-active{background:rgba(255,149,0,.15);border-color:rgba(255,149,0,.6);color:var(--acc3);animation:spblink .9s infinite}
-@keyframes spblink{0%,100%{border-color:rgba(255,149,0,.6)}50%{border-color:rgba(255,149,0,.2)}}
 
 
 /* ── ZONE MAP OVERLAY ── */
@@ -312,7 +406,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 /* Status bar */
 .sbar{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);padding:4px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0;height:30px}
 .sm-bar{width:110px;height:8px;background:var(--bg0);border:1px solid rgba(255,255,255,.08);border-radius:1px;overflow:hidden}
-.sm-fill{height:100%;background:linear-gradient(90deg,#1a4faa 0%,#4a9eff 55%,#ffcc00 78%,#ff3344 100%);width:0%;transition:width .1s}
+.sm-fill{height:100%;background:linear-gradient(90deg,#254a72 0%,#4a7ba8 55%,#c2924f 78%,#c25a5c 100%);width:0%;transition:width .1s}
 .pb{width:4px;border-radius:1px;background:var(--acc);opacity:.15;transition:all .3s}
 .pb.on{opacity:1;box-shadow:0 0 4px var(--acc)}
 .stxt{flex:1;font-family:var(--fui);font-size:11px;color:var(--acc);letter-spacing:1px;font-weight:600}
@@ -436,6 +530,191 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 .vl-pool-lbl{font-size:9px;font-family:var(--fmono);color:var(--txt2)}
 .vl-empty{font-size:10px;color:var(--txt3);font-style:italic;padding:8px 0;text-align:center}
 
+/* ══════════════════════════════════════════════
+   LAYOUT C — SPLIT TERMINAL
+   Applied via body.layout-c
+   ══════════════════════════════════════════════ */
+
+/* ── C: Root overrides ── */
+body.layout-c{
+  --lc-bg0:#08090e;--lc-bg1:#0d0f14;--lc-bg2:#111318;--lc-bg3:#0a0b10;
+  --lc-border:rgba(255,255,255,.07);--lc-border2:rgba(255,255,255,.12);
+  --lc-easy:#6fa384;--lc-adv:#4a7ba8;--lc-ck:#c2924f;
+  --lc-muted:rgba(255,255,255,.18);--lc-dim:rgba(255,255,255,.04);
+}
+
+/* ── C: Tab bar below header ── */
+body.layout-c .lc-tabs{
+  display:flex;align-items:stretch;background:var(--lc-bg1);
+  border-bottom:1px solid var(--lc-border);flex-shrink:0;height:32px;
+}
+.lc-tabs{display:none}
+body.layout-c .lc-tab{
+  padding:0 16px;font-family:var(--fmono);font-size:10px;letter-spacing:.08em;
+  color:rgba(255,255,255,.25);cursor:pointer;display:flex;align-items:center;
+  border-right:1px solid var(--lc-border);border-bottom:2px solid transparent;
+  transition:all .15s;user-select:none;
+}
+body.layout-c .lc-tab:hover{color:rgba(255,255,255,.55)}
+body.layout-c .lc-tab.lc-active{
+  color:var(--acc);border-bottom-color:var(--acc);background:rgba(74,158,255,.06);
+}
+body.layout-c .lc-tab.lc-active-cw{color:var(--purple);border-bottom-color:var(--purple)}
+body.layout-c .lc-tab-spacer{flex:1}
+body.layout-c .lc-tab-call{
+  padding:0 14px;font-family:var(--fmono);font-size:9px;color:rgba(255,255,255,.25);
+  display:flex;align-items:center;letter-spacing:.06em;border-left:1px solid var(--lc-border);
+}
+
+/* ── C: Layout structure ── */
+body.layout-c .main{display:grid;grid-template-columns:148px 1fr 182px}
+body.layout-c .lp{
+  width:148px;background:var(--lc-bg1);border-right:1px solid var(--lc-border);
+  font-family:var(--fmono);
+}
+body.layout-c .rp{
+  width:182px;background:var(--lc-bg1);border-left:1px solid var(--lc-border);
+}
+body.layout-c .cp{background:var(--lc-bg0)}
+
+/* ── C: Left panel sections ── */
+body.layout-c .psec{padding:8px 10px;border-bottom:1px solid var(--lc-border)}
+body.layout-c .plbl{
+  font-size:7px;font-weight:600;letter-spacing:1.8px;color:rgba(255,255,255,.2);
+  text-transform:uppercase;margin-bottom:6px;
+}
+body.layout-c .plbl::after{background:var(--lc-border)}
+
+/* ── C: Difficulty dot rows (left panel) ── */
+body.layout-c .diff-preset-grid{display:flex;flex-direction:column;gap:3px}
+body.layout-c .diff-preset-card{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 7px;border-radius:5px;border-width:1px;
+  text-align:left;
+}
+body.layout-c .diff-preset-card:hover{transform:none}
+body.layout-c .diff-preset-card .dpc-icon{font-size:11px;line-height:1}
+body.layout-c .diff-preset-card .dpc-name{
+  font-family:var(--fmono);font-size:9px;font-weight:700;
+  letter-spacing:.04em;flex:1;
+}
+body.layout-c .diff-preset-card .dpc-sub{
+  font-size:7px;line-height:1.3;
+}
+body.layout-c .diff-preset-card .dpc-badge{
+  position:static;font-size:7px;padding:1px 4px;border-radius:3px;
+}
+/* easy */
+body.layout-c .diff-preset-card.easy{border-color:rgba(0,212,100,.2);background:rgba(0,212,100,.04)}
+body.layout-c .diff-preset-card.easy.active{border-color:rgba(0,212,100,.5);background:rgba(0,212,100,.09)}
+body.layout-c .diff-preset-card.easy .dpc-name{color:rgba(0,212,100,.5)}
+body.layout-c .diff-preset-card.easy.active .dpc-name{color:var(--lc-easy)}
+/* advanced */
+body.layout-c .diff-preset-card.advanced{border-color:rgba(74,158,255,.2);background:rgba(74,158,255,.04)}
+body.layout-c .diff-preset-card.advanced.active{border-color:rgba(74,158,255,.5);background:rgba(74,158,255,.08)}
+body.layout-c .diff-preset-card.advanced .dpc-name{color:rgba(74,158,255,.5)}
+body.layout-c .diff-preset-card.advanced.active .dpc-name{color:var(--lc-adv)}
+/* ck */
+body.layout-c .diff-preset-card.ck{border-color:rgba(255,214,10,.2);background:rgba(255,214,10,.04)}
+body.layout-c .diff-preset-card.ck.active{border-color:rgba(255,214,10,.5);background:rgba(255,214,10,.07)}
+body.layout-c .diff-preset-card.ck .dpc-name{color:rgba(255,214,10,.5)}
+body.layout-c .diff-preset-card.ck.active .dpc-name{color:var(--lc-ck)}
+
+/* ── C: Auto-Adapt in left panel ── */
+body.layout-c .aa-btn{
+  border-color:rgba(74,158,255,.25);background:rgba(74,158,255,.04);
+  color:rgba(255,255,255,.3);font-size:9px;letter-spacing:.06em;
+  padding:5px 7px;border-radius:5px;
+}
+body.layout-c .aa-btn.on{
+  border-color:rgba(74,158,255,.5);background:rgba(74,158,255,.09);color:var(--acc);
+}
+
+/* ── C: Waterfall ── */
+body.layout-c .wf-wrap{
+  background:var(--lc-bg3);border-bottom:1px solid var(--lc-border);
+}
+
+/* ── C: Signal bar ── */
+body.layout-c .sbar{
+  background:var(--lc-bg1);border-bottom:1px solid var(--lc-border);height:28px;
+}
+
+/* ── C: RX window ── */
+body.layout-c .rxw{
+  background:var(--lc-bg3);border-bottom:1px solid var(--lc-border);
+  font-family:var(--fmono);font-size:10px;
+}
+body.layout-c .rl{border-bottom:1px solid rgba(255,255,255,.04)}
+body.layout-c .rl.cq{color:var(--acc)}
+body.layout-c .rl.ok{color:var(--lc-easy)}
+body.layout-c .rl.sys{color:rgba(255,255,255,.2)}
+body.layout-c .rl.pu{color:var(--acc4)}
+body.layout-c .rl.err{color:var(--red)}
+
+/* ── C: Input area ── */
+body.layout-c .inarea{
+  background:var(--lc-bg1);border-top:1px solid var(--lc-border);
+}
+body.layout-c .cinput{
+  background:var(--lc-bg3);border-color:rgba(74,158,255,.3);
+  font-family:var(--fmono);
+}
+body.layout-c .cinput:focus{border-color:rgba(74,158,255,.7)}
+
+/* ── C: adapt-status-sec hidden (moved to dot-bar) ── */
+body.layout-c #adapt-status-sec{display:none}
+
+/* ── C: LEVEL DOT BAR — replaces bbar ── */
+body.layout-c .bbar{display:none}
+.lc-dotbar{
+  display:none;background:var(--lc-bg1);border-top:1px solid var(--lc-border);
+  padding:0 14px;height:28px;align-items:center;gap:0;flex-shrink:0;
+}
+body.layout-c .lc-dotbar{display:flex}
+.lc-dotbar-label{
+  font-family:var(--fmono);font-size:8px;letter-spacing:.1em;
+  color:rgba(255,255,255,.2);margin-right:10px;white-space:nowrap;
+}
+.lc-dots-wrap{display:flex;gap:5px;align-items:center}
+.lc-dot{
+  width:10px;height:10px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  transition:all .3s cubic-bezier(.4,0,.2,1);flex-shrink:0;
+}
+.lc-dot.d-easy{background:var(--lc-easy);border-color:rgba(0,212,100,.5);box-shadow:0 0 5px rgba(0,212,100,.35)}
+.lc-dot.d-adv{background:var(--lc-adv);border-color:rgba(74,158,255,.5);box-shadow:0 0 5px rgba(74,158,255,.35)}
+.lc-dot.d-ck{background:var(--lc-ck);border-color:rgba(255,214,10,.5);box-shadow:0 0 5px rgba(255,214,10,.3)}
+.lc-dot.d-pulse{animation:lc-pulse .6s ease-out}
+@keyframes lc-pulse{0%{transform:scale(1.5)}100%{transform:scale(1)}}
+.lc-dotbar-mid{display:flex;align-items:center;gap:10px;margin-left:auto;margin-right:auto}
+.lc-dotbar-info{
+  font-family:var(--fmono);font-size:9px;color:rgba(255,255,255,.3);
+  white-space:nowrap;letter-spacing:.04em;
+}
+.lc-dotbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.lc-dotbar-stat{font-family:var(--fmono);font-size:9px;color:rgba(255,255,255,.25);white-space:nowrap}
+.lc-dotbar-stat strong{color:var(--acc);font-weight:400}
+.lc-aa-led{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;
+  animation:aa-pulse 1.2s ease-in-out infinite;display:none}
+.lc-aa-led.on{display:inline-block}
+.lc-aa-cd-bar{font-family:var(--fmono);font-size:8px;color:rgba(74,158,255,.5);letter-spacing:.04em}
+
+/* ── C: Tab content panels ── */
+.lc-panel{display:none}
+body.layout-c .lc-panel.lc-panel-active{display:flex;flex-direction:column;flex:1;overflow:hidden}
+body.layout-c .cp{display:flex;flex-direction:column;flex:1;overflow-y:auto;overflow-x:hidden}
+
+/* ── C: Score row in right panel ── */
+body.layout-c .big-score{
+  background:var(--lc-bg3);border:1px solid var(--lc-border);border-radius:4px;
+}
+body.layout-c .sc-card{background:var(--lc-bg3);border-color:var(--lc-border)}
+
+/* ── C: VFO compact ── */
+body.layout-c .vfo-wrap{background:var(--lc-bg3);border-color:var(--lc-border)}
+body.layout-c .vfo-freq{font-size:16px;letter-spacing:.06em}
+
 </style>
 </head>
 <body>
@@ -444,7 +723,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">HF CONTEST <span>TRAINER</span></div>
-    <div class="login-sub">SSB &amp; CW · v6.23</div>
+    <div class="login-sub">SSB &amp; CW · v6.53</div>
     <div class="login-lbl">Your callsign</div>
     <input class="login-input" id="login-call" type="text" maxlength="12"
       autocomplete="off" autocorrect="off" autocapitalize="characters"
@@ -463,9 +742,9 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 <!-- HEADER -->
 <div class="hdr">
   <div class="tb-dots">
-    <div class="tb-dot" style="background:#ff5f57"></div>
-    <div class="tb-dot" style="background:#febc2e"></div>
-    <div class="tb-dot" style="background:#4a9eff"></div>
+    <div class="tb-dot" style="background:#a86b6d"></div>
+    <div class="tb-dot" style="background:#a8853f"></div>
+    <div class="tb-dot" style="background:#4a7ba8"></div>
   </div>
   <div class="htitle">HF CONTEST <span>TRAINER</span></div>
   <div class="hdr-mid">
@@ -475,17 +754,26 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
   <div class="hdr-right">
     <!-- THEME SWITCHER -->
     <div class="theme-switcher" title="Farbschema wählen">
-      <div class="theme-dot active" id="tdot-dark"  style="background:#4a9eff" onclick="setTheme('dark')"  title="Dunkel (Standard)"></div>
-      <div class="theme-dot"        id="tdot-light" style="background:#f5f7fb;border:2px solid #4a9eff" onclick="setTheme('light')" title="Hell / Weiß"></div>
+      <div class="theme-dot active" id="tdot-dark"  style="background:#4a7ba8" onclick="setTheme('dark')"  title="Dunkel (Standard)"></div>
+      <div class="theme-dot"        id="tdot-light" style="background:#f5f7fb;border:2px solid #4a7ba8" onclick="setTheme('light')" title="Hell / Weiß"></div>
     </div>
     <span class="led" id="rx-led"></span>
     <div class="hclock" id="clk">--:--:--z</div>
-    <button class="sp-toggle" id="sp-toggle-btn" onclick="toggleSPMode()" title="Search &amp; Pounce: Scan band, click station to work">RUN</button>
+    <button class="sp-toggle" id="vad-btn" onclick="toggleVoiceInput()" title="Spracheingabe (VAD) — kein PTT nötig" style="border-color:rgba(74,158,255,.3);color:var(--txt3)">🎤 VOICE</button>
     <button class="sp-toggle" onclick="showVoiceLab()" title="Voice Lab — Stimmen auswählen &amp; testen" style="border-color:rgba(191,90,242,.35);color:var(--purple);font-size:12px;padding:4px 11px">🎙</button>
     <button class="sp-toggle" onclick="showManual()" title="Open Manual" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.5);font-size:12px;padding:4px 11px">?</button>
     <button class="sp-toggle" id="blind-toggle-btn" onclick="toggleBlindMode()" title="Rufzeichen ausblenden — nur nach Gehör arbeiten">👁 BLIND</button>
     <div class="mycall-badge" id="mycall-badge" onclick="showLeaderboard()">—</div>
   </div>
+</div>
+
+<!-- LAYOUT C: TAB BAR (visible only in layout-c mode) -->
+<div class="lc-tabs" id="lc-tabs">
+  <div class="lc-tab lc-active" id="lct-trainer" onclick="lcSwitchTab('trainer')">TRAINER</div>
+  <div class="lc-tab" id="lct-analytics" onclick="lcSwitchTab('analytics')">ANALYTICS</div>
+  <div class="lc-tab" id="lct-log" onclick="lcSwitchTab('log')">LOG</div>
+  <div class="lc-tab-spacer"></div>
+  <div class="lc-tab-call" id="lc-tab-call">—</div>
 </div>
 
 <div class="main">
@@ -519,6 +807,41 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
   </div>
 
   <!-- Contest selector -->
+  <!-- DIFFICULTY PRESETS -->
+  <div class="psec" id="diff-preset-sec">
+    <div class="plbl">Difficulty</div>
+    <div class="diff-preset-grid">
+
+      <!-- EASY -->
+      <div class="diff-preset-card easy active" id="dpc-easy" onclick="selectDiffPreset('easy')" title="Kein Pile-Up — eine Station, starkes Signal, langsam">
+        <div class="dpc-badge">LVL 1</div>
+        <div class="dpc-icon">🟢</div>
+        <div class="dpc-name">EASY</div>
+        <div class="dpc-sub">kein<br>Pile-Up</div>
+      </div>
+
+      <!-- ADVANCED -->
+      <div class="diff-preset-card advanced" id="dpc-advanced" onclick="selectDiffPreset('advanced')" title="Kleines Pile-Up — 2 bis 3 Stationen, typischer Contest">
+        <div class="dpc-badge">LVL 3</div>
+        <div class="dpc-icon">📻</div>
+        <div class="dpc-name">ADVANCED</div>
+        <div class="dpc-sub">wenig<br>Pile-Up</div>
+      </div>
+
+      <!-- CONTEST KING -->
+      <div class="diff-preset-card ck" id="dpc-ck" onclick="selectDiffPreset('ck')" title="Volles Pile-Up — hohe QRM, starke Konkurrenz, Pro-Niveau">
+        <div class="dpc-badge">LVL 8</div>
+        <div class="dpc-icon">👑</div>
+        <div class="dpc-name">CONTEST<br>KING</div>
+        <div class="dpc-sub">lösbares<br>Pile-Up</div>
+      </div>
+
+    </div>
+    <div id="diff-preset-desc" style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-top:5px;letter-spacing:.4px;line-height:1.5">
+      Eine Station · starkes Signal · kein QRM
+    </div>
+  </div>
+
   <div class="psec" id="contest-sel-sec">
     <div class="plbl">Contest</div>
     <select id="csel">
@@ -526,12 +849,13 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
       <option value="cqww">CQ WW SSB</option>
       <option value="wpx">CQ WPX SSB</option>
       <option value="arrldx">ARRL DX SSB</option>
+      <option value="iaru">IARU HF World Championship</option>
       <option value="vhf">VHF/UHF Contest</option>
     </select>
     <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-top:5px;letter-spacing:.5px" id="exinfo">Callsign only — no exchange</div>
-
-
   </div>
+
+
 
   <div id="cw-sec" class="psec" style="display:none">
     <div class="plbl">CW Settings</div>
@@ -570,21 +894,6 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     </div>
   </div>
 
-  <div class="psec">
-    <div class="plbl">Difficulty</div>
-    <div class="diff-btns">
-      <div class="diff-btn on" id="diff-easy" onclick="setDiff('easy')">
-        <span class="diff-name">EASY</span><span style="font-size:9px;color:var(--acc2)">★☆☆</span>
-      </div>
-      <div class="diff-btn" id="diff-medium" onclick="setDiff('medium')">
-        <span class="diff-name">MEDIUM</span><span style="font-size:9px;color:var(--acc)">★★☆</span>
-      </div>
-      <div class="diff-btn ck" id="diff-ck" onclick="setDiff('ck')">
-        <span class="diff-name">HARD</span><span style="font-size:9px;color:var(--red)">★★★</span>
-      </div>
-    </div>
-    <div style="font-size:9px;color:var(--acc2);font-family:var(--fui);margin-top:5px;text-align:center;opacity:.8" id="adapt-hint">● Adaptive training active</div>
-  </div>
 
   <!-- TRAINING MODIFIERS -->
   <div class="psec">
@@ -593,6 +902,12 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
       <div class="diff-btn" id="mod-weak" onclick="toggleWeakSignal()" title="Reduces signal volume and adds QRM — practice real DX conditions">
         <span class="diff-name" style="font-size:10px" id="mod-weak-name">📉 WEAK SIGNAL</span>
         <span style="font-size:8px;color:var(--txt3)" id="mod-weak-lbl">off</span>
+      </div>
+
+      <!-- v19.2: Partial-Call-Modus reaktiviert -->
+      <div class="diff-btn" id="mod-partial" onclick="togglePartialCall()" title="Teile des Rufzeichens werden von einem QRM-Burst überlagert — vollständiges Call kopieren">
+        <span class="diff-name" style="font-size:10px" id="mod-partial-name">📻 PARTIAL CALL</span>
+        <span style="font-size:8px;color:var(--txt3)" id="mod-partial-lbl">off</span>
       </div>
 
     </div>
@@ -656,6 +971,14 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     </div>
     <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-bottom:7px;letter-spacing:.5px">Callers bleiben nach QSO aktiv</div>
 
+    <!-- v19.2: MEDIUM CALLERS — Anzahl gleichzeitiger Rufer bei MEDIUM -->
+    <div class="sr-row">
+      <span class="sr-lbl" style="width:46px" title="Anzahl gleichzeitiger Rufer im MEDIUM-Modus">RUFER</span>
+      <input type="range" min="1" max="4" value="2" id="s-medium-callers" oninput="setMediumCallers(this.value)">
+      <span class="sr-val" id="v-medium-callers">2</span>
+    </div>
+    <div style="font-size:7px;color:var(--txt3);font-family:var(--fui);margin:-3px 0 6px 46px" id="medium-callers-hint">2 Stationen rufen gleichzeitig</div>
+
     <!-- PILE DENSITY: how simultaneous callers sound -->
     <div class="sr-row">
       <span class="sr-lbl" style="width:46px" title="1=nacheinander, 10=gleichzeitig chaotisch">GLEICH.</span>
@@ -686,14 +1009,6 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
       <span>kurz</span><span>lang</span>
     </div>
     <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);letter-spacing:.8px;min-height:12px" id="rpile-status">● Inaktiv</div>
-  </div>
-
-  <!-- S&P BAND OVERVIEW (only visible in S&P mode) -->
-  <div class="psec" id="sp-stations-sec" style="display:none">
-    <div class="plbl">📡 S&amp;P — Band</div>
-    <div style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-bottom:7px;letter-spacing:.5px">Click station → tune &amp; call</div>
-    <div id="sp-station-list" style="display:flex;flex-direction:column;gap:4px"></div>
-    <button class="btn" style="margin-top:8px;text-align:center;font-size:9px" onclick="spRefreshBand()">🔄 Scan Band</button>
   </div>
 
 </div>
@@ -753,6 +1068,8 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
       autocomplete="off" autocorrect="off" autocapitalize="characters"
       spellcheck="false" placeholder="CALLSIGN..."
       onkeydown="hkeyCall(event)">
+    <!-- VAD / Speech status line -->
+    <div id="vad-status" style="display:none;font-size:9px;font-family:var(--fmono);color:var(--txt3);margin-top:3px;letter-spacing:.5px;min-height:12px;transition:color .2s"></div>
 
 
     <!-- Exchange input panel — shown after callsign confirmed, content depends on contest -->
@@ -779,6 +1096,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 
     <div class="actbar">
       <button class="abt ab-rep" onclick="replay()">REPLAY<span class="sub">F3</span></button>
+      <button class="abt ab-cq" onclick="requestAgain()" title="Station wiederholt ihr Rufzeichen langsam und deutlich">AGAIN?<span class="sub">F7</span></button>
       <button class="abt ab-skip" onclick="skip()">SKIP<span class="sub">F2</span></button>
       <button class="abt ab-log" onclick="submitQSO()">⏎ LOG — ENTER</button>
     </div>
@@ -786,9 +1104,33 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     <!-- START / PAUSE / STOP below LOG -->
     <div class="sess-btns">
       <button class="ab-start" id="btn-start" onclick="startSess()">▶ START</button>
+
       <button class="ab-pause" id="btn-pause" onclick="pauseSess()">⏸ PAUSE</button>
       <button class="ab-stop" id="btn-stop" onclick="stopSess()">■ STOP</button>
     </div>
+  </div>
+
+  <!-- ADAPTIVE STATUS -->
+  <div class="psec" id="adapt-status-sec">
+    <div class="plbl">Adaptive Level</div>
+    <!-- AUTO-ADAPT 45s toggle -->
+    <div class="aa-wrap">
+      <div class="aa-btn" id="aa-btn" onclick="toggleAutoAdapt()" title="Passt Speed/Level alle 45 Sek. automatisch an — basierend auf deiner QSO-Rate der letzten 45 Sek.">
+        <span class="aa-dot" id="aa-dot"></span>
+        <span id="aa-btn-lbl">AUTO-ADAPT</span>
+      </div>
+      <div class="aa-countdown hidden" id="aa-countdown">
+        <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="13" cy="13" r="11" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+          <circle id="aa-arc" cx="13" cy="13" r="11" stroke="var(--acc)" stroke-width="2"
+            stroke-dasharray="69.1" stroke-dashoffset="0" stroke-linecap="round"
+            style="transition:stroke-dashoffset .9s linear"/>
+        </svg>
+        <div class="aa-countdown-num" id="aa-num">45</div>
+      </div>
+    </div>
+    <div id="adapt-status-bar" style="font-size:10px;color:var(--acc);font-family:var(--fui);font-weight:700;letter-spacing:.5px;margin-top:6px">⟳ Startet mit Session...</div>
+    <div id="adapt-status-detail" style="font-size:8px;color:var(--txt3);font-family:var(--fui);margin-top:3px;letter-spacing:.3px;line-height:1.5"></div>
   </div>
 </div>
 
@@ -848,6 +1190,7 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
     <button class="btn" onclick="showReview()" style="text-align:center;margin-bottom:4px">REVIEW SESSION</button>
     <button class="btn gold" onclick="showLeaderboard()" style="text-align:center;margin-bottom:4px">🏆 LEADERBOARD</button>
     <button class="btn" onclick="showAnalytics()" style="text-align:center;margin-bottom:4px;border-color:var(--purple);color:var(--purple)">📊 ANALYTICS</button>
+    <button class="btn" onclick="exportSessionsCSV()" style="text-align:center;margin-bottom:4px;border-color:rgba(0,212,100,.4);color:rgba(0,212,100,.85)" title="Session-Daten als CSV herunterladen">⬇ EXPORT CSV</button>
     <button class="btn danger" onclick="clearSess()" style="text-align:center">CLEAR LOG</button>
   </div>
 
@@ -856,9 +1199,37 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 
 <div class="bbar">
   <span>Operator: <strong id="bbar-call">—</strong></span>
-  <span id="bbar-diff" style="color:var(--acc2)">● EASY</span>
+  <span id="bbar-diff" style="color:var(--acc2)">● LVL 2 · EASY</span>
   <span id="bbar-mode" style="color:var(--acc)">📻 SSB</span>
+  <span id="bbar-rate" style="color:var(--acc3)">0 QSO/h</span>
   <span id="bbar-status" style="color:var(--txt3)">Ready</span>
+</div>
+
+<!-- LAYOUT C: LEVEL DOT BAR -->
+<div class="lc-dotbar" id="lc-dotbar">
+  <span class="lc-dotbar-label">LVL</span>
+  <div class="lc-dots-wrap" id="lc-dots-wrap">
+    <div class="lc-dot" id="lcdot-1"></div>
+    <div class="lc-dot" id="lcdot-2"></div>
+    <div class="lc-dot" id="lcdot-3"></div>
+    <div class="lc-dot" id="lcdot-4"></div>
+    <div class="lc-dot" id="lcdot-5"></div>
+    <div class="lc-dot" id="lcdot-6"></div>
+    <div class="lc-dot" id="lcdot-7"></div>
+    <div class="lc-dot" id="lcdot-8"></div>
+    <div class="lc-dot" id="lcdot-9"></div>
+    <div class="lc-dot" id="lcdot-10"></div>
+  </div>
+  <div class="lc-dotbar-mid">
+    <span class="lc-dotbar-info" id="lc-dotbar-info">─── Ready ───</span>
+  </div>
+  <div class="lc-dotbar-right">
+    <div class="lc-aa-led" id="lc-aa-led"></div>
+    <span class="lc-aa-cd-bar" id="lc-aa-cd-bar"></span>
+    <span class="lc-dotbar-stat"><strong id="lc-stat-qso">0</strong> QSO</span>
+    <span class="lc-dotbar-stat"><strong id="lc-stat-rate">0</strong>/h</span>
+    <span class="lc-dotbar-stat"><strong id="lc-stat-acc">—</strong> acc</span>
+  </div>
 </div>
 
 <!-- LEADERBOARD -->
@@ -1005,57 +1376,120 @@ input[type=range]{flex:1;height:3px;background:rgba(255,255,255,.1);border-radiu
 // CALLSIGN GENERATOR - ITU compliant
 // ═══════════════════════════════════════════════════════════════════
 const PREFIXES=[
-  {p:['W','K','N','AA','AB','AC','AD'],d:[0,9],s:[2,3],z:[3,4,5]},
-  {p:['VE','VA'],d:[1,9],s:[2,3],z:[1,2,3,4,5]},
+  // North America — CQ zones 3-5
+  {p:['W','K','N','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL'],d:[0,9],s:[2,3],z:[3,4,5]},
+  {p:['WA','WB','WC','WD','WE','WF','WG','WH','WI','WJ','WK','WL','WM','WN','WO','WP','WQ','WR','WS','WT','WU','WV','WW','WX','WY','WZ'],d:[0,9],s:[2,3],z:[3,4,5]},
+  {p:['VE','VA','VB','VC','VD','VF'],d:[1,9],s:[2,3],z:[1,2,3,4,5]},
   {p:['XE'],d:[1,3],s:[2,3],z:[6]},
-  {p:['KH6'],d:[''],s:[2,2],z:[31]},
-  {p:['KL'],d:[0,9],s:[2,3],z:[1]},
-  {p:['KP4','WP4'],d:[''],s:[2,2],z:[8]},
-  {p:['DL','DK','DJ','DA','DC','DD','DF','DG','DH'],d:[0,9],s:[2,3],z:[14]},
-  {p:['OE'],d:[1,9],s:[2,3],z:[15]},
-  {p:['G','M'],d:[0,9],s:[2,3],z:[14]},
-  {p:['GM'],d:[0,9],s:[2,3],z:[14]},
-  {p:['GW'],d:[0,9],s:[2,3],z:[14]},
-  {p:['EI'],d:[0,9],s:[2,3],z:[14]},
-  {p:['F'],d:[0,9],s:[2,3],z:[14]},
-  {p:['I','IK','IW','IZ'],d:[0,9],s:[2,3],z:[15]},
-  {p:['EA','EB','EC'],d:[1,9],s:[2,3],z:[14]},
-  {p:['CT'],d:[1,9],s:[2,3],z:[14]},
-  {p:['SP','SN','SQ'],d:[0,9],s:[2,3],z:[15]},
-  {p:['OK','OL'],d:[1,9],s:[2,3],z:[15]},
-  {p:['OM'],d:[1,9],s:[2,3],z:[15]},
-  {p:['PA','PB','PC','PH'],d:[0,9],s:[2,3],z:[14]},
-  {p:['ON','OO','OQ'],d:[1,9],s:[2,3],z:[14]},
+  {p:['XF4'],d:[''],s:[2,3],z:[7]},   // Revilla Gigedo, CQ 7
+  {p:['KH6','AH6'],d:[''],s:[2,2],z:[31]},
+  {p:['KL7','AL7','NL7','WL7'],d:[''],s:[2,3],z:[1]},
+  {p:['KP4','WP4','NP4'],d:[''],s:[2,2],z:[8]},
+  {p:['KP2','WP2','NP2'],d:[''],s:[2,2],z:[8]},  // USVI, CQ 8
+  {p:['VP9'],d:[''],s:[2,2],z:[5]},
+  {p:['P4'],d:[''],s:[2,2],z:[9]},
+  {p:['HH'],d:[1,9],s:[2,3],z:[8]},   // Haiti, CQ 8
+  {p:['HI'],d:[1,9],s:[2,3],z:[8]},   // Dominican Republic
+  {p:['TI'],d:[1,9],s:[2,3],z:[7]},   // Costa Rica, CQ 7
+  {p:['HP'],d:[1,9],s:[2,3],z:[7]},   // Panama
+  {p:['YN'],d:[1,9],s:[2,3],z:[7]},   // Nicaragua
+  {p:['HQ','HR'],d:[1,9],s:[2,3],z:[7]}, // Honduras
+  {p:['TG'],d:[1,9],s:[2,3],z:[7]},   // Guatemala
+  // South America — CQ zones 9-13
+  {p:['PY','PP','PT','PQ','PR','PS'],d:[1,9],s:[2,3],z:[11]},
+  {p:['LU','LO','LT','L2','L3'],d:[1,9],s:[2,3],z:[13]},
+  {p:['CE'],d:[1,9],s:[2,3],z:[12]},
+  {p:['OA'],d:[1,9],s:[2,3],z:[10]},  // Peru, CQ 10
+  {p:['HC'],d:[1,9],s:[2,3],z:[10]},  // Ecuador
+  {p:['HK'],d:[1,9],s:[2,3],z:[9]},   // Colombia, CQ 9
+  {p:['YV'],d:[1,9],s:[2,3],z:[9]},   // Venezuela
+  {p:['CP'],d:[1,9],s:[2,3],z:[10]},  // Bolivia
+  {p:['ZP'],d:[1,9],s:[2,3],z:[11]},  // Paraguay
+  {p:['CX'],d:[1,9],s:[2,3],z:[13]},  // Uruguay
+  // Europe West — CQ zone 14
+  {p:['DL','DK','DJ','DA','DC','DD','DF','DG','DH','DI'],d:[0,9],s:[2,3],z:[14]},
+  {p:['G','M','2E','2M'],d:[0,9],s:[2,3],z:[14]},
+  {p:['GM','MM','2M'],d:[0,9],s:[2,3],z:[14]},
+  {p:['GW','MW'],d:[0,9],s:[2,3],z:[14]},
+  {p:['GI','MI'],d:[0,9],s:[2,3],z:[14]},
+  {p:['GJ'],d:[''],s:[2,3],z:[14]},   // Jersey
+  {p:['GU'],d:[''],s:[2,3],z:[14]},   // Guernsey
+  {p:['EI','EJ'],d:[0,9],s:[2,3],z:[14]},
+  {p:['F','TM'],d:[0,9],s:[2,3],z:[14]},
+  {p:['EA','EB','EC','ED'],d:[1,9],s:[2,3],z:[14]},
+  {p:['EA8'],d:[''],s:[2,3],z:[33]},  // Canary Islands, CQ 33
+  {p:['CT','CR','CS'],d:[1,9],s:[2,3],z:[14]},
+  {p:['CU'],d:[1,9],s:[2,3],z:[14]}, // Azores
+  {p:['PA','PB','PC','PD','PE','PF','PG','PH'],d:[0,9],s:[2,3],z:[14]},
+  {p:['ON','OO','OQ','OR'],d:[1,9],s:[2,3],z:[14]},
   {p:['LX'],d:[1,9],s:[2,3],z:[14]},
   {p:['HB'],d:[0,9],s:[2,3],z:[14]},
+  {p:['HB0'],d:[''],s:[2,3],z:[14]}, // Liechtenstein
+  {p:['IS0','IM0'],d:[''],s:[2,3],z:[15]}, // Sardinia
+  // Europe Central — CQ zone 15
+  {p:['OE'],d:[1,9],s:[2,3],z:[15]},
+  {p:['I','IK','IW','IZ','IT'],d:[0,9],s:[2,3],z:[15]},
+  {p:['SP','SN','SQ','SR','3Z'],d:[0,9],s:[2,3],z:[15]},
+  {p:['OK','OL'],d:[1,9],s:[2,3],z:[15]},
+  {p:['OM'],d:[1,9],s:[2,3],z:[15]},
   {p:['HA','HG'],d:[0,9],s:[2,3],z:[15]},
   {p:['S5'],d:[0,9],s:[2,3],z:[15]},
   {p:['9A'],d:[1,9],s:[2,3],z:[15]},
-  {p:['YO'],d:[1,9],s:[2,3],z:[20]},
-  {p:['LZ'],d:[1,9],s:[2,3],z:[20]},
-  {p:['SV'],d:[1,9],s:[2,3],z:[20]},
-  {p:['OH','OF'],d:[1,9],s:[2,3],z:[18]},
-  {p:['SM','SA','SK'],d:[0,9],s:[2,3],z:[18]},
-  {p:['LA'],d:[0,9],s:[2,3],z:[18]},
+  {p:['YU','YT'],d:[1,9],s:[2,3],z:[15]},
+  {p:['4N','4O'],d:[''],s:[2,3],z:[15]}, // Serbia/Montenegro
+  {p:['Z3'],d:[''],s:[2,3],z:[15]},   // North Macedonia
+  {p:['T7'],d:[''],s:[2,3],z:[15]},   // San Marino
+  {p:['9H'],d:[1,9],s:[2,3],z:[15]},  // Malta
+  {p:['E7'],d:[''],s:[2,3],z:[15]},   // Bosnia
+  {p:['Z6'],d:[''],s:[2,3],z:[15]},   // Kosovo
+  // Europe North — CQ zones 18 & 40
+  {p:['OH','OF','OG'],d:[1,9],s:[2,3],z:[18]},
+  {p:['OH0'],d:[''],s:[2,3],z:[18]},  // Aland
+  {p:['SM','SA','SK','SL'],d:[1,7],s:[2,3],z:[18]},
+  {p:['LA','LB','LC'],d:[0,9],s:[2,3],z:[18]},
   {p:['OZ'],d:[1,9],s:[2,3],z:[18]},
   {p:['TF'],d:[1,9],s:[2,3],z:[40]},
-  {p:['UA','RA','RK'],d:[1,6],s:[2,3],z:[16,17]},
-  {p:['UR','US','UT','EM'],d:[0,9],s:[2,3],z:[16]},
-  {p:['YU','YT'],d:[1,9],s:[2,3],z:[15]},
-  {p:['JA','JH','JF','JK'],d:[1,9],s:[2,3],z:[25]},
-  {p:['HL','DS'],d:[0,9],s:[2,3],z:[25]},
-  {p:['BY','BA'],d:[1,9],s:[2,4],z:[24]},
+  // Europe East — CQ zones 16 & 17
+  {p:['UA','RA','RK','RN','RW','RX','RZ','R1'],d:[1,6],s:[2,3],z:[16,17]},
+  {p:['UR','US','UT','UV','UW','EM','EN','EO'],d:[0,9],s:[2,3],z:[16]},
+  {p:['ES'],d:[1,9],s:[2,3],z:[15]},  // Estonia, CQ 15
+  {p:['YL'],d:[1,9],s:[2,3],z:[15]},  // Latvia, CQ 15
+  {p:['LY'],d:[1,9],s:[2,3],z:[15]},  // Lithuania, CQ 15
+  // Balkans — CQ zone 20
+  {p:['YO','YP','YQ','YR'],d:[1,9],s:[2,3],z:[20]},
+  {p:['LZ'],d:[1,9],s:[2,3],z:[20]},
+  {p:['SV','J4'],d:[1,9],s:[2,3],z:[20]},
+  {p:['4X','4Z'],d:[1,9],s:[2,3],z:[20]},
+  // Middle East — CQ zones 20-21
+  {p:['TA','TC','YM'],d:[1,9],s:[2,3],z:[20]},  // Turkey
+  {p:['A6'],d:['1'],s:[2,3],z:[21]},  // UAE
+  {p:['A4'],d:['1'],s:[2,3],z:[21]},  // Oman
+  {p:['A9'],d:['1'],s:[2,3],z:[21]},  // Bahrain
+  {p:['9K'],d:[1,9],s:[2,3],z:[21]},  // Kuwait
+  {p:['HZ'],d:[1,9],s:[2,3],z:[21]},  // Saudi Arabia
+  {p:['OD'],d:[1,9],s:[2,3],z:[20]},  // Lebanon
+  // Africa — CQ zones 33-39
+  {p:['ZS'],d:[1,6],s:[2,3],z:[38]},
+  {p:['5B'],d:[''],s:[2,3],z:[20]},   // Cyprus, CQ 20
+  {p:['CN'],d:[1,9],s:[2,3],z:[33]},  // Morocco
+  {p:['EA9'],d:[''],s:[2,3],z:[33]},  // Ceuta/Melilla
+  {p:['5A'],d:[''],s:[2,3],z:[33]},   // Libya
+  {p:['SU'],d:[1,9],s:[2,3],z:[34]},  // Egypt
+  {p:['5Z'],d:[1,9],s:[2,3],z:[37]},  // Kenya
+  {p:['9J'],d:[1,9],s:[2,3],z:[37]},  // Zambia
+  {p:['ZW','ZX','ZY'],d:[1,9],s:[2,3],z:[11]}, // Brazil special
+  // Asia — CQ zones 24-28
+  {p:['JA','JH','JF','JK','JI','JJ','JL','JM','JN','JO','JP','JQ','JR'],d:[1,9],s:[2,3],z:[25]},
+  {p:['HL','DS','DT'],d:[0,9],s:[2,3],z:[25]},
+  {p:['BY','BA','BG','BH','BI','BJ','BL'],d:[1,9],s:[2,4],z:[24]},
+  {p:['VU'],d:[2,9],s:[2,3],z:[26]},  // India, CQ 26
+  {p:['9V'],d:[1,9],s:[2,3],z:[28]},  // Singapore, CQ 28
+  {p:['HS','E2'],d:[0,9],s:[2,3],z:[26]}, // Thailand
+  {p:['JT'],d:[1,9],s:[2,3],z:[23]},  // Mongolia
+  // Oceania — CQ zones 28-32
   {p:['VK'],d:[1,8],s:[2,3],z:[29,30]},
   {p:['ZL'],d:[1,4],s:[2,3],z:[32]},
-  {p:['PY','PP','PT'],d:[1,9],s:[2,3],z:[11]},
-  {p:['LU','LO','LT'],d:[1,9],s:[2,3],z:[13]},
-  {p:['CE'],d:[1,9],s:[2,3],z:[12]},
-  {p:['ZS'],d:[1,6],s:[2,3],z:[38]},
-  {p:['4X'],d:[1,9],s:[2,3],z:[20]},
-  {p:['T7'],d:[''],s:[2,3],z:[15]},
-  {p:['VP9'],d:[''],s:[2,2],z:[5]},
-  {p:['P4'],d:[''],s:[2,2],z:[9]},
-  {p:['A6'],d:['1'],s:[2,3],z:[21]},
+  {p:['YB','YC','YD','YE','YF','YG','YH'],d:[0,9],s:[2,3],z:[28]}, // Indonesia
 ];
 const AL='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 function rI(a,b){return a+Math.floor(Math.random()*(b-a+1));}
@@ -1064,7 +1498,7 @@ function mkS(mn,mx){let s='',n=rI(mn,mx);for(let i=0;i<n;i++)s+=AL[Math.floor(Ma
 
 // Easy: only short, simple EU/NA calls (2-3 char suffix, common prefixes)
 const PREFIXES_EASY=[
-  {p:['DL','DJ','DB','DG'],d:[1,9],s:[2,3],z:[14]},
+  {p:['DL','DJ','DB','DG','DK'],d:[1,9],s:[2,3],z:[14]},
   {p:['OE'],d:[1,9],s:[2,3],z:[15]},
   {p:['HB'],d:[0,9],s:[2,3],z:[14]},
   {p:['G','M','2E'],d:[0,9],s:[2,3],z:[14]},
@@ -1074,17 +1508,27 @@ const PREFIXES_EASY=[
   {p:['SP'],d:[1,9],s:[2,3],z:[15]},
   {p:['OM'],d:[1,9],s:[2,3],z:[15]},
   {p:['OK'],d:[1,9],s:[2,3],z:[15]},
+  {p:['HA'],d:[1,9],s:[2,3],z:[15]},
+  {p:['S5'],d:[0,9],s:[2,3],z:[15]},
+  {p:['9A'],d:[1,9],s:[2,3],z:[15]},
+  {p:['I','IK','IW','IZ'],d:[0,9],s:[2,3],z:[15]},
+  {p:['EA','EB'],d:[1,9],s:[2,3],z:[14]},
+  {p:['CT'],d:[1,9],s:[2,3],z:[14]},
+  {p:['LX'],d:[1,9],s:[2,3],z:[14]},
+  {p:['EI'],d:[0,9],s:[2,3],z:[14]},
+  {p:['YU','YT'],d:[1,9],s:[2,3],z:[15]},
   {p:['W','K','N','AA','AB','AC'],d:[1,9],s:[2,3],z:[5]},
+  {p:['VE','VA'],d:[1,9],s:[2,3],z:[3,4,5]},
 ];
 
 // CK: rare/complex DX calls, longer suffixes, portable/special suffixes
 const PREFIXES_CK=[
-  {p:['UA9','RA9','UA0'],d:[''],s:[2,3],z:[17,18,19]},
+  {p:['UA9','RA9','UA0','RA0'],d:[''],s:[2,3],z:[17,18,19]},
   {p:['JT'],d:[1,9],s:[2,3],z:[23]},
   {p:['EX'],d:[0,9],s:[2,3],z:[17]},
-  {p:['A5'],d:['1'],s:[2,3],z:[26]},
-  {p:['VR2'],d:[''],s:[2,3],z:[24]},
-  {p:['9V'],d:[1,9],s:[2,3],z:[28]},
+  {p:['A5'],d:['1'],s:[2,3],z:[26]},  // Bhutan
+  {p:['VR2'],d:[''],s:[2,3],z:[24]},  // Hong Kong
+  {p:['9V'],d:[1,9],s:[2,3],z:[28]},  // Singapore
   {p:['ZL'],d:[1,4],s:[2,3],z:[32]},
   {p:['VK9'],d:['X'],s:[2,2],z:[29]},
   {p:['TF'],d:[1,9],s:[2,3],z:[40]},
@@ -1098,6 +1542,24 @@ const PREFIXES_CK=[
   {p:['ZS'],d:[1,6],s:[2,3],z:[38]},
   {p:['VP9'],d:[''],s:[2,2],z:[5]},
   {p:['P4'],d:[''],s:[2,2],z:[9]},
+  {p:['T32'],d:[''],s:[2,2],z:[31]},  // East Kiribati
+  {p:['KH8'],d:[''],s:[2,2],z:[32]},  // American Samoa
+  {p:['3D2'],d:[''],s:[2,3],z:[28]},  // Fiji
+  {p:['YB','YC'],d:[0,9],s:[2,3],z:[28]}, // Indonesia
+  {p:['9M2','9M6'],d:[''],s:[2,3],z:[28]}, // Malaysia
+  {p:['HS'],d:[0,9],s:[2,3],z:[26]},  // Thailand
+  {p:['VU'],d:[2,9],s:[2,3],z:[26]},  // India
+  {p:['4S'],d:['7'],s:[2,3],z:[26]},  // Sri Lanka
+  {p:['AP'],d:[1,9],s:[2,3],z:[21]},  // Pakistan
+  {p:['A4'],d:['1'],s:[2,3],z:[21]},  // Oman
+  {p:['A9'],d:['1'],s:[2,3],z:[21]},  // Bahrain
+  {p:['9K'],d:[1,9],s:[2,3],z:[21]},  // Kuwait
+  {p:['5B'],d:[''],s:[2,3],z:[20]},   // Cyprus
+  {p:['CN'],d:[1,9],s:[2,3],z:[33]},  // Morocco
+  {p:['5Z'],d:[1,9],s:[2,3],z:[37]},  // Kenya
+  {p:['ZL9'],d:[''],s:[2,2],z:[32]},  // Campbell Is.
+  {p:['XU'],d:['7'],s:[2,3],z:[26]},  // Cambodia
+  {p:['3W'],d:[''],s:[2,3],z:[26]},   // Vietnam
 ];
 
 // Portable/special suffixes used in CK mode
@@ -1274,10 +1736,164 @@ const CONTESTS={
     genEx:()=>({rst:'59',serial:rI(100,999)}),getMult:()=>null},
   arrldx:{name:'ARRL DX SSB',exInfo:'Exchange: RST + State/Province (from DX side)',
     genEx:()=>({rst:'59',state:rE(['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','ON','QC','BC','AB','MB','SK','NS','NB','NL','PE','NT','YT','NU'])}),getMult:f=>f.state},
+  iaru:{name:'IARU HF World Championship',exInfo:'Exchange: RST + ITU Zone or HQ',
+    // Realistic ITU zone weights: European/US zones dominate real contest traffic
+    _zones:(function(){
+      const weighted=[];
+      // ITU zone weights for IARU HF Championship — EU + NA heavy
+      // ITU 28=Central EU(OE,DL,I,SP,OK,OM,HA,S5,9A,YU,LZ,HB)
+      // ITU 27=W-EU(F,G,ON,PA,LX,EA,CT)  ITU 18=Scandinavia
+      // ITU 16=E-Russia/Baltics  ITU 17=Ukraine/Romania
+      // ITU 8=E-USA  ITU 7=W-USA  ITU 4=E-Canada  ITU 3=W-Canada
+      const hot=[
+        28,28,28,28,28,28,28,28,
+        27,27,27,27,27,27,
+        18,18,18,18,18,
+        16,16,17,17,20,20,
+        8,8,8,8,8,8,
+        7,7,7,7,
+        4,4,4,3,3,
+        25,25,30,29,13,26,40,38,
+      ];
+      hot.forEach(z=>weighted.push(z));
+      for(let z=1;z<=90;z++) weighted.push(z);
+      return weighted;
+    })(),
+    // IARU Society HQ stations (real calls used in contest)
+    _hqStations:[
+      {call:'OE3A',   society:'ÖVSV',    zone:28},  // Austria, ITU 28
+      {call:'DL0HQ',  society:'DARC',    zone:28},  // Germany, ITU 28
+      {call:'II3ITU', society:'ARI',     zone:28},  // Italy, ITU 28
+      {call:'LX7I',   society:'RL',      zone:27},  // Luxembourg, ITU 27
+      {call:'TM0HQ',  society:'REF',     zone:27},  // France, ITU 27
+      {call:'GR2HQ',  society:'RSGB',    zone:27},  // UK, ITU 27
+      {call:'HG1S',   society:'MRASZ',   zone:28},  // Hungary, ITU 28
+      {call:'OZ5E',   society:'EDR',     zone:18},  // Denmark, ITU 18
+      {call:'PI4HQ',  society:'VERON',   zone:27},  // Netherlands, ITU 27
+      {call:'SE5E',   society:'SSA',     zone:18},  // Sweden, ITU 18
+      {call:'OH2HQ',  society:'SRAL',    zone:18},  // Finland, ITU 18
+      {call:'LZ9W',   society:'BFRA',    zone:28},  // Bulgaria, ITU 28
+      {call:'W1AW',   society:'ARRL',    zone:8},   // USA, ITU 8
+      {call:'VE3EJ',  society:'RAC',     zone:4},   // Canada, ITU 4
+      {call:'JA0HQI', society:'JARL',    zone:25},  // Japan, ITU 25
+      {call:'UA9HQ',  society:'SRR',     zone:30},  // Russia AS, ITU 30
+      {call:'RA9A',   society:'SRR',     zone:30},  // Russia AS, ITU 30
+      {call:'ZS4TX',  society:'SARL',    zone:38},  // South Africa, ITU 38
+      {call:'VK6AA',  society:'WIA',     zone:29},  // Australia, ITU 29
+      {call:'SP5PBE', society:'PZK',     zone:28},  // Poland, ITU 28
+      {call:'OK5Z',   society:'CRC',     zone:28},  // Czech Republic, ITU 28
+      {call:'OM3KII', society:'SARA',    zone:28},  // Slovakia, ITU 28
+      {call:'HB9HQ',  society:'USKA',    zone:28},  // Switzerland, ITU 28 (actually 27 — Zurich area)
+      {call:'LA2HQ',  society:'NRRL',    zone:18},  // Norway, ITU 18
+      {call:'YU1HQ',  society:'SRS',     zone:28},  // Serbia, ITU 28
+      {call:'9A1HQ',  society:'HRS',     zone:28},  // Croatia, ITU 28
+      {call:'S59HQ',  society:'ZRS',     zone:28},  // Slovenia, ITU 28
+      {call:'HA7HQ',  society:'MRASZ',   zone:28},  // Hungary alt, ITU 28
+      {call:'SX3A',   society:'RAAG',    zone:28},  // Greece, ITU 28
+      {call:'RK3AWL', society:'SRR',     zone:16},  // Russia EU, ITU 16
+      {call:'PY5HQ',  society:'LABRE',   zone:13},  // Brazil, ITU 13
+      // Additional HQ stations
+      {call:'YT0HQ',  society:'SRS',     zone:28},  // Serbia
+      {call:'T77HQ',  society:'IARU-SM', zone:28},  // San Marino
+      {call:'SX5HQ',  society:'RAAG',    zone:28},  // Greece alt
+      {call:'4U1ITU', society:'ITU',     zone:28},  // ITU Geneva (special)
+      {call:'LY0HQ',  society:'LRMD',    zone:16},  // Lithuania
+      {call:'ES5HQ',  society:'ERAU',    zone:29},  // Estonia (ITU 29 wrong->16)
+      {call:'YL2HQ',  society:'LRAL',    zone:16},  // Latvia
+      {call:'EW1HQ',  society:'BFRR',    zone:16},  // Belarus
+      {call:'UR7HQ',  society:'UARL',    zone:16},  // Ukraine
+      {call:'LZ0HQ',  society:'BFRA',    zone:28},  // Bulgaria alt
+      {call:'TA0HQ',  society:'TRAC',    zone:20},  // Turkey
+      {call:'ZL6HQ',  society:'NZART',   zone:60},  // New Zealand
+      {call:'BY1RX',  society:'CRAC',    zone:33},  // China
+      {call:'ZS9HQ',  society:'SARL',    zone:38},  // South Africa alt
+      {call:'VK9HQ',  society:'WIA',     zone:29},  // Australia alt
+      {call:'CE3HQ',  society:'RCCH',    zone:14},  // Chile
+      {call:'LU1HQ',  society:'RACA',    zone:13},  // Argentina
+      {call:'TF3HQ',  society:'IRA',     zone:40},  // Iceland
+      {call:'OY1HQ',  society:'FOF',     zone:18},  // Faroe Islands
+      {call:'OX3HQ',  society:'EDR',     zone:5},   // Greenland
+      {call:'5B4HQ',  society:'CRSA',    zone:20},  // Cyprus
+      {call:'A71HQ',  society:'QRS',     zone:21},  // Qatar
+      {call:'JY9HQ',  society:'RJAS',    zone:20},  // Jordan
+      {call:'OD5HQ',  society:'LNRS',    zone:20},  // Lebanon
+      {call:'SU1HQ',  society:'ERSA',    zone:34},  // Egypt
+      {call:'7X0HQ',  society:'ARA',     zone:33},  // Algeria
+      {call:'CN2HQ',  society:'RAM',     zone:33},  // Morocco
+    ],
+    _isHQ: function(call){ return this._hqStations.some(h=>h.call===call); },
+    genEx: function(){
+      // 12% chance of HQ station
+      if(Math.random() < 0.12){
+        const hq = this._hqStations[Math.floor(Math.random()*this._hqStations.length)];
+        return {rst:'59', ituzone: null, hq: hq};
+      }
+      const z = this._zones[Math.floor(Math.random()*this._zones.length)];
+      return {rst:'59', ituzone: z, hq: null};
+    },
+    getMult: function(f){ return f.hq ? 'HQ_'+f.hq.call : f.ituzone; }
+  },
   vhf:{name:'VHF/UHF Contest',exInfo:'Exchange: 59 + Serial (100–999) + Locator (4 chars)',
     genEx:(z,call)=>({rst:'59',serial:rI(100,999),loc:getLocatorForCall(call||'DL1ABC')}),
     getMult:f=>f.loc},
 };
+
+// =================================================================
+// BAND CONFIG
+// =================================================================
+const BAND_CONFIG = {
+  '80': { label:'80m', freq:'3.5–3.8 MHz', info:'80m · EU-lastig · Nahbereich',
+    catWeights:{ eu_short:5, eu_long:4, na:1.5, dx_asia:0.3, dx_exotic:0.3, portable:0.4 } },
+  '40': { label:'40m', freq:'7.0–7.2 MHz', info:'40m · EU + NA nachts laut',
+    catWeights:{ eu_short:4, eu_long:3, na:2.5, dx_asia:0.8, dx_exotic:0.5, portable:0.4 } },
+  '20': { label:'20m', freq:'14.0–14.35 MHz', info:'20m · Weltband · EU+NA+JA',
+    catWeights:{ eu_short:3, eu_long:2.5, na:2.5, dx_asia:1.5, dx_exotic:1.0, portable:0.5 } },
+  '15': { label:'15m', freq:'21.0–21.45 MHz', info:'15m · NA + SA sehr laut',
+    catWeights:{ eu_short:2, eu_long:1.5, na:3.5, dx_asia:1.5, dx_exotic:1.2, portable:0.3 } },
+  '10': { label:'10m', freq:'28.0–29.7 MHz', info:'10m · DX + Exoten dominant',
+    catWeights:{ eu_short:1.5, eu_long:1.0, na:3.0, dx_asia:2.0, dx_exotic:2.5, portable:0.5 } },
+};
+function getBandCatWeights(){
+  return (BAND_CONFIG[currentBand]||BAND_CONFIG['20']).catWeights;
+}
+
+
+
+
+// S&P: Station sendet CQ, dann antwortet sie auf unseren Ruf
+function startSPFlow(qso,cfg){
+  const cqUtter='CQ contest, '+callToSpeech(qso.call,false)+'. CQ.';
+  addLine('► [S&P] '+qso.call+' ruft CQ — Rufzeichen kopieren & Enter','sys');
+  document.getElementById('cqst').textContent=qso.call+' ruft CQ';
+  document.getElementById('bbar-status').textContent='S&P: Rufzeichen kopieren';
+  speak(cqUtter,qso.call,()=>{});
+}
+function startSPExchange(qso,cfg){
+  addLine('>> Du rufst '+qso.call+' an...','sys');
+  setTimeout(()=>{
+    addLine(qso.call+' antwortet:','sys');
+    exPhase=2;
+    showExPanel(true,true);
+    document.getElementById('input-label').textContent=T('exch_input');
+    document.getElementById('ex-hint').textContent=T('exch_coming');
+    cfg.speak(qso,()=>{
+      document.getElementById('ex-hint').textContent=cfg.hint+T('hint_listen');
+      const f=document.getElementById(cfg.fields[0]?.id);if(f)f.focus();
+    });
+  },700);
+}
+
+// =================================================================
+// SUFFIX-ONLY PARTIAL CALL
+// =================================================================
+function speakSuffixOnly(call,voice,cb){
+  const m=call.match(/\d+([A-Z]+(?:\/[A-Z]+)?)$/);
+  const suffix=m?m[1]:call;
+  const spoken=suffix.split('').map(c=>NATO[c]||c).join('. ');
+  document.getElementById('cqst').textContent='?? '+suffix;
+  speakSSB('Station, '+spoken+'.',voice||getVoiceForCall(call),cb);
+}
+
 
 // ═══════════════════════════════════════════════════════════════════
 // VOICE ENGINE
@@ -1384,6 +2000,10 @@ function accentForCall(call){
   if(/^(VU|VT|AT|AU|AV|AW|AX)/.test(c)) return 'in';
   // South Africa
   if(/^ZS/.test(c)||/^ZR/.test(c)||/^ZT/.test(c)||/^ZU/.test(c)) return 'za';
+  // Asia DX (Japan, Korea, China/Taiwan/HK, SE Asia)
+  if(/^(J[A-S]|7[J-N]|8[J-N]|HL|DS|D7|D9|6[K-N]|B[A-Z]|VR2|XX9|9V|9M|DU|DV|DW|DX|DY|DZ|4[D-I]|HS|E2|Y[B-H]|9N|4S|XV|3W|XU|A5)/.test(c)) return 'as';
+  // Africa DX (außer ZS)
+  if(/^(5N|5U|5Z|5H|5X|9J|9X|9U|7Q|7X|3B|TR|TU|TY|TZ|6W|C5|D2|D4|Z2|Z8|ET|EL|9G|9L|ZD7|ZD8|V5|A2|3D[A-M]|C9|S9)/.test(c)) return 'af';
   // Europe — use British-style voice (EU ops learned ITU phonetics from GB/IARU)
   if(/^(DL|DJ|DK|DF|F|TM|I|IK|IS|IT9|ON|OZ|PA|SM|OH|SP|YO|LY|YL|ES|HA|OE|HB|LX|OM|OK|S5|9A|LZ|SV|EA|CT|LA|JW|JX|TF|OY|TK)/.test(c)) return 'eu';
   return 'other';
@@ -1399,6 +2019,8 @@ const ACCENT_LANG = {
   nz:    ['en-NZ','en-AU'],
   in:    ['en-IN','en-GB'],
   za:    ['en-ZA','en-GB'],
+  as:    ['en-SG','en-HK','en-PH','en-IN'],
+  af:    ['en-NG','en-KE','en-TZ','en-ZA'],
   eu:    ['en-GB','en-US'],
   other: ['en-US','en-GB'],
 };
@@ -1452,6 +2074,27 @@ const QUALITY_NAMES = [
   'microsoft neerja online','microsoft ravi online','microsoft heera online',
   // ── Apple iOS / iPadOS voices ─────────────────────────────────────────────
   'siri','aaron (enhanced)','nicky (enhanced)','samantha (enhanced)',
+  // ── v21: additional macOS/iOS premium & enhanced voices ───────────────────
+  'zoe','joelle','kate','jamie','martha','isha','catherine',
+  // ── v21: Azure Neural — en-IE / en-NZ / en-CA / en-AU extras ──────────────
+  'microsoft emily','microsoft connor',              // Irish
+  'microsoft molly',                                 // New Zealand
+  'microsoft annette','microsoft carly','microsoft darren','microsoft duncan',
+  'microsoft elsie','microsoft freya','microsoft joanne','microsoft kim',
+  'microsoft tim','microsoft tina',                  // Australian
+  // ── v21: Azure Neural — en-IN extras ──────────────────────────────────────
+  'microsoft aarav','microsoft aashi','microsoft ananya','microsoft kavya',
+  'microsoft kunal','microsoft rehaan',
+  // ── v21: Azure Neural — en-ZA / Africa / Asia (DX accents!) ───────────────
+  'microsoft luke',                                  // South Africa
+  'microsoft abeo','microsoft ezinne',               // Nigeria (en-NG)
+  'microsoft asilia','microsoft chilemba',           // Kenya (en-KE)
+  'microsoft elimu','microsoft imani',               // Tanzania (en-TZ)
+  'microsoft wayne',                                 // Singapore (en-SG)
+  'microsoft yan',                                   // Hong Kong (en-HK)
+  'microsoft james','microsoft rosa',                // Philippines (en-PH)
+  // ── v21: Azure multilingual neural (Edge, sehr natürlich) ─────────────────
+  'multilingual',
 ];
 
 function buildVoicePool(){
@@ -1489,8 +2132,10 @@ function buildVoicePool(){
     const nzVoices = byLang(['en-NZ'],['new zealand','(en-nz)']);
     const inVoices = byLang(['en-IN'],['india','(en-in)','veena','rishi','neerja','google indian']);
     const zaVoices = byLang(['en-ZA'],['south africa','(en-za)','tessa','leah']);
+    const asVoices = byLang(['en-SG','en-HK','en-PH','en-MY'],['singapore','hongkong','hong kong','philippines','(en-sg)','(en-hk)','(en-ph)']);
+    const afVoices = byLang(['en-NG','en-KE','en-TZ'],['nigeria','kenya','tanzania','(en-ng)','(en-ke)','(en-tz)']);
     // Full pool — US+GB weighted 3× (dominate real contests), other regions 1×
-    let pool = [...usVoices,...usVoices,...usVoices,...gbVoices,...gbVoices,...gbVoices,...caVoices,...auVoices,...nzVoices,...ieVoices,...inVoices,...zaVoices];
+    let pool = [...usVoices,...usVoices,...usVoices,...gbVoices,...gbVoices,...gbVoices,...caVoices,...auVoices,...nzVoices,...ieVoices,...inVoices,...zaVoices,...asVoices,...afVoices];
     // Deduplicate
     pool = [...new Map(pool.map(v=>[v.name,v])).values()];
     // Boost user-starred favourites to the front (appear first in round-robin)
@@ -1518,11 +2163,13 @@ function buildVoicePool(){
       nz:    fb(nzVoices, auVoices, gbVoices),
       in:    fb(inVoices, gbVoices),
       za:    fb(zaVoices, gbVoices),
+      as:    fb(asVoices, inVoices, gbVoices),
+      af:    fb(afVoices, zaVoices, gbVoices),
       eu:    fb(gbVoices, usVoices),
       other: fb(usVoices, gbVoices),
     };
 
-    console.log('✅ Voices — US:'+usVoices.length+' GB:'+gbVoices.length+' AU:'+auVoices.length+' IE:'+ieVoices.length+' IN:'+inVoices.length+' ZA:'+zaVoices.length+' Pool:'+pool.length);
+    console.log('✅ Voices — US:'+usVoices.length+' GB:'+gbVoices.length+' AU:'+auVoices.length+' IE:'+ieVoices.length+' IN:'+inVoices.length+' ZA:'+zaVoices.length+' AS:'+asVoices.length+' AF:'+afVoices.length+' Pool:'+pool.length);
     pickAdjVoice();
   }catch(e){}
 }
@@ -2521,7 +3168,8 @@ function endBandEvent(ev) {
   bandOpenActive = false;
   bandOpenStrength = 1.0;
   // Restore pileup to difficulty default
-  pileCount = {easy:1,medium:4,ck:4}[difficulty]||1;
+  const medCallers2 = parseInt((document.getElementById('s-medium-callers')||{value:'2'}).value)||2;
+  pileCount = {easy:1,medium:medCallers2,ck:5}[difficulty]||1;
   setPile(pileCount);
   // Remove event-specific noises, keep band+contest+fading (CK baseline)
   if(activeNoiseModes.has('storm')){ activeNoiseModes.delete('storm'); if(audioCtx) stopNoise('storm'); }
@@ -2567,6 +3215,8 @@ const EL_ACCENTS = [
   {key:'eu',  flag:'🇪🇺', label:'EU   (DL/OE/F/I…)'},
   {key:'in',  flag:'🇮🇳', label:'IND  (VU/AT…)'},
   {key:'za',  flag:'🇿🇦', label:'ZAF  (ZS…)'},
+  {key:'as',  flag:'🌏', label:'ASIA (JA/HL/BY/9V…)'},
+  {key:'af',  flag:'🌍', label:'AFR  (5N/5Z/9J…)'},
   {key:'other',flag:'🌐', label:'Rest'},
 ];
 
@@ -2723,7 +3373,9 @@ function elPlayBuffer(buf, call, cb){
     });
     if(cb) cb();
   };
-  elCurrentSrc = src; mainSpeaking = true; src.start();
+  elCurrentSrc = src; mainSpeaking = true;
+  try{ src.start(); }
+  catch(e){ mainSpeaking = false; elCurrentSrc = null; stopQSBLFO(); if(cb) cb(); }
 }
 
 async function elSpeak(text, call, cb){
@@ -2922,7 +3574,9 @@ function speakNative(text, call, cb){
         if(voice) u.voice=voice;
         // Match utterance lang to voice's actual locale for best pronunciation
         u.lang = voice ? (voice.lang || 'en-US') : (call ? ({'us':'en-US','gb':'en-GB','au':'en-AU'}[accentForCall(call)]||'en-US') : 'en-US');
-        u.rate=Math.max(0.7, Math.min(1.6, ttsRate + rateVar));
+        u.rate=(typeof againRateOverride==='number')
+          ? Math.max(0.55, Math.min(1.0, againRateOverride))          // v19.2: AGAIN → langsam & deutlich, ohne Persona-Offset
+          : Math.max(0.7, Math.min(1.6, ttsRate + rateVar));
         u.pitch=pitchVar;
         u.volume=Math.min(1.0,vol/100);
         u.onerror=()=>{
@@ -3045,30 +3699,67 @@ function stopQSBLFO() {
   if(ckProtectGain){ try{ckProtectGain.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.1);}catch(e){} }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// v19.2: "AGAIN?" — Station wiederholt langsam & phonetisch deutlich
+// Realistischer Contest-Flow: statt Skip/Bust fragt der Operator nach.
+// Kostet Zeit (= Rate-Malus), wird als sc.agains gezählt und im
+// Leaderboard-Eintrag gespeichert. Taste: F7 oder AGAIN-Button.
+// ═══════════════════════════════════════════════════════════════════
+let againRateOverride = null;
+function requestAgain(){
+  if(!sessActive || paused) return;
+  if(appMode==='cw'){ replay(); return; }   // CW: normales Replay reicht
+  if(!curQSO) return;
+  initAudio();
+  stopActivePile(); stopResidualPile();
+  cancelMain();
+  sc.agains = (sc.agains||0) + 1;
+  try{
+    const st=document.getElementById('bbar-status');
+    if(st) st.textContent = uiLang==='de' ? '❓ AGAIN? — Station wiederholt…' : '❓ AGAIN? — station repeating…';
+  }catch(e){}
+  if(exPhase===2){
+    // Exchange-Phase: Exchange normal wiederholen
+    addLine(uiLang==='de' ? '❓ AGAIN? — Exchange wird wiederholt' : '❓ AGAIN? — repeating exchange','sys');
+    const cfg=getExConfig(contest);
+    setTimeout(()=>cfg.speak(curQSO, ()=>{}), 120);
+    return;
+  }
+  // Phase 1: Call zweimal, langsam, volle Phonetik, KEINE Partial-Maskierung
+  addLine(uiLang==='de' ? '❓ AGAIN? — Station buchstabiert langsam ('+(sc.agains)+'×)' : '❓ AGAIN? — station spelling slowly ('+(sc.agains)+'×)','sys');
+  const phrase = callToSpeech(curQSO.call);   // v22: nur 1x wiederholen
+  againRateOverride = 0.80;                    // v22: etwas schneller, bleibt deutlich
+  setTimeout(()=>{ speakNative(phrase, curQSO.call, ()=>{ againRateOverride=null; }); }, 120);
+  setTimeout(()=>{ againRateOverride=null; }, 8000);  // Safety-Reset (v22: 8s)
+  try{ const ci=document.getElementById('callinput'); if(ci) ci.focus(); }catch(e){}
+}
+
 function replay(){
   initAudio();
+  // ── Stop all pile audio first so replay is clean ──
+  stopActivePile();
+  stopResidualPile();
+  cancelMain();
   // Visual feedback: flash status text
   try{
     const st=document.getElementById('bbar-status');
     if(st){ const prev=st.textContent; st.textContent=T('replaying'); setTimeout(()=>{if(st.textContent===T('replaying'))st.textContent=prev;},1200); }
   }catch(e){}
   if(exPhase===1 && curQSO){
-    // S&P: replay full CQ
-    if(sAndPMode && spActive){ spStopCQLoop(); spSpeakCQ(); return; }
     // Phase 1: repeat callsign — respect partial call mode
     const v = getVoiceForCall(curQSO.call);
-    speakPartialCall(curQSO.call, v, ()=>{});
+    setTimeout(()=>speakPartialCall(curQSO.call, v, ()=>{}), 80);
     return;
   }
   if(exPhase===2 && curQSO){
     // Phase 2: repeat exchange for current contest
     const cfg=getExConfig(contest);
-    cfg.speak(curQSO, ()=>{});
+    setTimeout(()=>cfg.speak(curQSO, ()=>{}), 80);
     return;
   }
   if(!lastAudio) return;
   const call=curQSO?curQSO.call:'';
-  speak(lastAudio, call);
+  setTimeout(()=>speak(lastAudio, call), 80);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -3210,29 +3901,6 @@ function initWF() {
       wfMouse = -1;
       const tt = document.getElementById('wf-tooltip');
       if (tt) tt.style.display = 'none';
-    });
-
-    // S&P: click on a signal to tune to that station
-    wrap.addEventListener('click', (e) => {
-      if(!sAndPMode || !sessActive || paused || exPhase===2) return;
-      const rect = wrap.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) / rect.width * wfW;
-      const W = wrap.offsetWidth || wfW;
-      const cx = W / 2;
-      // Find closest S&P station signal
-      let best = null, bestDist = 40; // 40px tolerance
-      wfSignals.forEach(sig => {
-        if(sig.type !== 'main' && sig.type !== 'adj') return;
-        const px = cx + sig.freqOff;
-        const d = Math.abs(mx - px);
-        if(d < bestDist && sig.label){
-          bestDist = d; best = sig.label;
-        }
-      });
-      if(best){
-        const idx = spStations.findIndex(s=>s.call===best);
-        if(idx>=0) spTuneTo(idx);
-      }
     });
 
     wfRebuildSignals();
@@ -3440,6 +4108,7 @@ function recordQSOTimestamp(){
   rateHist.push(rate);
   if(rateHist.length > 30) rateHist.shift();
   document.getElementById('s-rate').textContent = rate;
+  try{ document.getElementById('bbar-rate').textContent = rate+' QSO/h'; }catch(e){}
   drawRG();
 }
 
@@ -3544,10 +4213,12 @@ const STRINGS = {
     hint_serial:    'Enter serial number',
     hint_state:     'Enter US state or Canadian province (2 letters)',
     hint_vhf:       'Enter serial number and locator',
+    hint_ituzone:   'Enter ITU zone number (1–90)',
     hint_listen:    ' → Enter',
     zone_wrong:     'Zone wrong — listen again',
     serial_wrong:   'Serial wrong — listen again',
     state_wrong:    'State/Province wrong — listen again',
+    ituzone_wrong:  'ITU Zone wrong — listen again',
     serial_loc_wrong:'Serial and locator wrong — listen again',
     serial_only:    'Serial number wrong',
     loc_only:       'Locator wrong',
@@ -3613,6 +4284,7 @@ const STRINGS = {
     fl_locator:   'LOCATOR',
     fl_zone:      'CQ ZONE',
     fl_state:     'STATE / PROV',
+    fl_ituzone:   'ITU ZONE',
     // Misc UI
     adj_active:   (n) => '● Active · '+n+' stations',
     adj_inactive: '● Inactive',
@@ -3662,10 +4334,12 @@ const STRINGS = {
     hint_serial:    'Seriennummer eingeben',
     hint_state:     'US-Bundesstaat oder kanad. Provinz eingeben (2 Buchstaben)',
     hint_vhf:       'Seriennummer und Locator eingeben',
+    hint_ituzone:   'ITU-Zone eingeben (1–90)',
     hint_listen:    ' → Eingabe',
     zone_wrong:     'Zone falsch — nochmals zuhören',
     serial_wrong:   'Seriennummer falsch — nochmals zuhören',
     state_wrong:    'Bundesstaat/Provinz falsch — nochmals zuhören',
+    ituzone_wrong:  'ITU-Zone falsch — nochmals zuhören',
     serial_loc_wrong:'Seriennummer und Locator falsch — nochmals zuhören',
     serial_only:    'Seriennummer falsch',
     loc_only:       'Locator falsch',
@@ -3728,6 +4402,7 @@ const STRINGS = {
     fl_locator:   'LOCATOR',
     fl_zone:      'CQ-ZONE',
     fl_state:     'STAAT / PROV',
+    fl_ituzone:   'ITU-ZONE',
     // Misc UI
     adj_active:   (n) => '● Aktiv · '+n+' Stationen',
     adj_inactive: '● Inactive',
@@ -3931,7 +4606,9 @@ function speakPartialCall(call, voiceForCall, onComplete){
 // ═══════════════════════════════════════════════════════════════════
 let myCall='—';
 let myLocator='JN67'; // default, overwritten at login
-let appMode='ssb', contest='onlycall', difficulty='easy';
+let appMode='ssb', contest='onlycall', difficulty='easy'; // adaptive system manages difficulty
+let currentBand='80'; // 80 40 20 15 10
+const opMode='run';   // S&P removed — always RUN
 let vol=75, spd=95, pileCount=1;
 let sessActive=false, paused=false, sessStart=null, sessTimer=null, timerMax=600;
 let pausedAt=0, totalPaused=0;
@@ -4084,13 +4761,13 @@ function classifyCall(call) {
 // Weaker categories (lower Elo) get picked more often
 function pickWeightedCat() {
   const cats = Object.keys(CALL_CATS);
-  // Weights: inverse of rating (worse = more practice needed)
-  // Also boost categories with negative streak
+  const GEO = getBandCatWeights(); // band-aware geo distribution
   const weights = cats.map(c => {
     const e = elo[c] || { rating: ELO_DEFAULT, streak: 0 };
     const ratingWeight = Math.max(0.2, (2400 - e.rating) / 1400);
     const streakBoost  = e.streak < -2 ? 1.8 : e.streak < 0 ? 1.3 : 1.0;
-    return ratingWeight * streakBoost;
+    const geoBase      = GEO[c] || 1.0;
+    return ratingWeight * streakBoost * geoBase;
   });
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -4112,10 +4789,10 @@ function genCallAdaptive() {
     : pickWeightedCat();
   let pool;
   switch(targetCat) {
-    case 'na':        pool = PREFIXES.filter(e => e.p.some(p => /^(W|K|N|AA|AB|VE|VA)/.test(p))); break;
-    case 'dx_asia':   pool = PREFIXES.filter(e => e.p.some(p => /^(JA|JH|HL|DS|BY|VK|ZL)/.test(p))); break;
-    case 'eu_short':  pool = PREFIXES.filter(e => e.p.some(p => /^(DL|DJ|OE|HB|G|F|ON|PA|SP|OM|OK|I|EA)/.test(p))); break;
-    case 'eu_long':   pool = PREFIXES.filter(e => e.p.some(p => /^(SM|OH|LA|OZ|GM|GW|HA|S5|9A|YO|LZ|UA)/.test(p))); break;
+    case 'na':        pool = PREFIXES.filter(e => e.p.some(p => /^(W|K|N|AA|A[B-Z]|VE|VA|VY|VO)/.test(p))); break;
+    case 'dx_asia':   pool = PREFIXES.filter(e => e.p.some(p => /^(JA|JH|JR|JE|JF|JG|JI|JK|JL|JM|HL|DS|BY|BA|BD|BG|VK|ZL|HS|9V|DU)/.test(p))); break;
+    case 'eu_short':  pool = PREFIXES.filter(e => e.p.some(p => /^(DL|DJ|DK|DA|D[B-Z]|OE|HB9|G[^M]|M\d|F\d|TM|ON|OO|PA|P[D-I]|SP|SN|SO|SR|3Z|OM|O[LK]|I[A-Z\d]|EA|E[B-H]|CT|CR)/.test(p))); break;
+    case 'eu_long':   pool = PREFIXES.filter(e => e.p.some(p => /^(SM|SA|S[K-Z]|OH|O[FGI]|LA|L[B-G]|OZ|OW|XP|GM|GW|GD|GI|G[JOUX]|HA|HG|S5|9A|YO|Y[PQR]|LZ|SV|S[WX]|UR|U[ST]|EM|EW|E[SU]|YL|LY|Y[UZ]|4N|4O|UA[1-6]|RA[1-6]|TA|YM|4Z|4X)/.test(p))); break;
     case 'dx_exotic': pool = difficulty==='ck' ? PREFIXES_CK : PREFIXES; break;
     default:          pool = difficulty==='ck' ? PREFIXES_CK : PREFIXES;
   }
@@ -4186,7 +4863,7 @@ function updAdapt(ok, cat) {
 
   // Smart hint based on weakest category
   const hint = buildAdaptHint(ok);
-  document.getElementById('adapt-hint').textContent = hint;
+  try{ const ah=document.getElementById('adapt-hint'); if(ah) ah.textContent = hint; }catch(e){}
 }
 
 function buildAdaptHint(lastOk) {
@@ -4250,7 +4927,7 @@ function updTimer(){
     }
     const rate=elapsed>10?Math.round(sc.qso/(elapsed/3600)):0;
     document.getElementById('s-rate').textContent=rate;
-    if(elapsed>0&&elapsed%20===0){rateHist.push(rate);if(rateHist.length>20)rateHist.shift();drawRG();}
+    if(elapsed>0&&elapsed%20===0&&elapsed!==window._lastRatePush){window._lastRatePush=elapsed;rateHist.push(rate);if(rateHist.length>20)rateHist.shift();drawRG();}
     if(elapsed>=300){
       document.getElementById('proj-qso').textContent=rate;
       document.getElementById('proj-score').textContent=(rate*Math.max(1,sc.mults)*getPts()).toLocaleString();
@@ -4280,60 +4957,6 @@ function setTime(m){
   document.getElementById('tval').textContent=m===0?'∞':String(m).padStart(2,'0')+':00';
 }
 
-function setDiff(d){
-  difficulty=d;
-  ['easy','medium','ck'].forEach(x=>{const el=document.getElementById('diff-'+x);if(el)el.classList.remove('on','on-cw');});
-  const btn=document.getElementById('diff-'+d); if(btn) btn.classList.add(appMode==='cw'?'on-cw':'on');
-  // Difficulty controls pileup count
-  // Medium: 4 callers by default (jitter +0/+1 → 4–5 stations heard per QSO).
-  const cfg={easy:{pile:1},medium:{pile:4},ck:{pile:5}};
-  pileCount=(cfg[d]||cfg.easy).pile;
-  // Sync pile-density default per difficulty (user can still override via slider).
-  // Medium sits around 5 → audibly more overlap without becoming chaotic.
-  const dens = {easy:3, medium:5, ck:7}[d];
-  if(typeof dens === 'number'){
-    pileDensity = dens;
-    const ds = document.getElementById('s-pile-density');
-    if(ds) ds.value = dens;
-    const dv = document.getElementById('v-pile-density');
-    if(dv) dv.textContent = String(dens);
-  }
-  document.getElementById('bbar-diff').textContent='● '+{easy:'EASY',medium:'MEDIUM',ck:'HARD'}[d]||'● EASY';
-  document.getElementById('bbar-diff').style.color={easy:'var(--acc2)',medium:'var(--acc)',ck:'var(--red)'}[d]||'var(--acc2)';
-
-  // ── Auto-adjust RF filter per difficulty (only if user hasn't manually changed) ──
-  // Easy: light filter (3), Medium: medium (5), CK: heavy (8)
-  const autoFilt = {easy:3, medium:5, ck:8}[d];
-  rfFiltLevel = autoFilt;
-  const filtSlider = document.getElementById('s-rfilt');
-  if(filtSlider) filtSlider.value = autoFilt;
-  document.getElementById('v-rfilt').textContent = autoFilt;
-  if(audioCtx) buildSSBChain();
-  updateRFiltLabel();
-
-  // ── Auto-configure noise profile per difficulty ──
-  if(d==='easy'){
-    // Quiet band: only base band noise, low QRN
-    activeNoiseModes=new Set(['band']);
-    if(audioCtx){stopAllNoise();startNoise('band');}
-  }else if(d==='medium'){
-    // Some contest noise added
-    activeNoiseModes=new Set(['band','contest']);
-    if(audioCtx){stopAllNoise();['band','contest'].forEach(m=>startNoise(m));}
-  }else if(d==='ck'){
-    // Full chaos: contest + fading
-    activeNoiseModes=new Set(['band','contest','fading']);
-    if(audioCtx){stopAllNoise();['band','contest','fading'].forEach(m=>startNoise(m));}
-  }
-  // Sync noise buttons UI
-  ['band','contest','storm','aurora','fading'].forEach(t=>{
-    const btn=document.getElementById('nb-'+t);
-    if(btn) btn.classList.toggle('on', activeNoiseModes.has(t));
-  });
-  updateNoiseLabel();
-  if(typeof wfRebuildSignals==='function'){ wfRebuildSignals(); wfUpdateOverlay(); }
-}
-
 function setVol(v){vol=parseInt(v);try{if(masterGain)masterGain.gain.value=vol/100;}catch(e){}document.getElementById('v-vol').textContent=v;}
 function setSpd(v){spd=parseInt(v);document.getElementById('v-spd').textContent=v;}
 function setQRN(v){qrnLevel=parseInt(v);document.getElementById('v-qrn').textContent=v;if(audioCtx)updateNoiseGains();}
@@ -4344,6 +4967,7 @@ const EX_MAP_EN={
   cqww:'Exchange: RST + CQ Zone',
   wpx:'Exchange: RST + Serial number (001–999)',
   arrldx:'Exchange: RST + US State / Canadian Province',
+  iaru:'Exchange: RST + ITU Zone (1–90) or "HQ" for Society stations',
   vhf:'Exchange: 59 + Serial (100–999) + Locator (4 chars)'
 };
 const EX_MAP_DE={
@@ -4351,6 +4975,7 @@ const EX_MAP_DE={
   cqww:'Austausch: RST + CQ-Zone',
   wpx:'Austausch: RST + Seriennummer (001–999)',
   arrldx:'Exchange: RST + US state / Canadian province',
+  iaru:'Austausch: RST + ITU-Zone (1–90) oder "HQ" bei Society-Stationen (OE3A, DL0HQ, ...)',
   vhf:'Austausch: 59 + Serien-Nr (100–999) + Locator (4 Stellen)'
 };
 function getExInfo(c){ return (uiLang==='de'?EX_MAP_DE:EX_MAP_EN)[c]||''; }
@@ -4378,7 +5003,7 @@ const BAND_CONDITIONS = [
     durationMin:3, durationMax:5
   },
   {
-    id:'morning', name:'Morning Opening', color:'#ffd60a',
+    id:'morning', name:'Morning Opening', color:'#c2924f',
     desc:'JA & Asia loud · long-path signals',
     rfDelta:-1, qrnDelta:-5,
     callBias:'dx_asia',       // more Asian calls
@@ -4399,14 +5024,14 @@ const BAND_CONDITIONS = [
     durationMin:3, durationMax:5
   },
   {
-    id:'na_opening', name:'NA Opening', color:'#4a9eff',
+    id:'na_opening', name:'NA Opening', color:'#4a7ba8',
     desc:'North America opening · W/K loud',
     rfDelta:-1, qrnDelta:-4,
     callBias:'na',
     durationMin:3, durationMax:5
   },
   {
-    id:'grayline', name:'Gray Line', color:'#ff9f0a',
+    id:'grayline', name:'Gray Line', color:'#a8853f',
     desc:'Peak DX window · all continents audible',
     rfDelta:-2, qrnDelta:-8,
     callBias:'dx_exotic',
@@ -4520,11 +5145,33 @@ function scheduleBandCond(){
 }
 
 function startBandSim(){
-  bandCondIdx  = 0;
+  // ── Time-of-day: pick a realistic starting condition ──────────────
+  // Simulates 20m propagation profile (main IARU HF band)
+  // UTC hour → most likely opening
+  const utcHour = new Date().getUTCHours();
+  const todCondMap = {
+    // UTC 05–09: JA/Asia long-path, gray line
+    5:'morning', 6:'morning', 7:'grayline', 8:'morning', 9:'morning',
+    // UTC 10–14: EU peak, normal
+    10:'eu_peak', 11:'eu_peak', 12:'eu_peak', 13:'normal', 14:'normal',
+    // UTC 15–18: NA opening building
+    15:'na_opening', 16:'na_opening', 17:'na_opening', 18:'na_opening',
+    // UTC 19–21: contest peak (evening EU)
+    19:'eu_peak', 20:'na_opening', 21:'na_opening',
+    // UTC 22–23 & 00–04: band closing / quiet
+    22:'closing', 23:'closing', 0:'closing', 1:'normal', 2:'normal', 3:'normal', 4:'normal',
+  };
+  const startCondId = todCondMap[utcHour] || 'normal';
+  const startIdx = BAND_CONDITIONS.findIndex(c=>c.id===startCondId);
+  bandCondIdx  = startIdx >= 0 ? startIdx : 0;
   bandCallBias = null;
   bandBaseRF   = rfFiltLevel;
   bandBaseQRN  = qrnLevel;
-  applyBandCond(currentBandCond(), false);
+  const startCond = currentBandCond();
+  applyBandCond(startCond, false);
+  // Show time-of-day hint in RX log
+  const utcStr = String(utcHour).padStart(2,'0')+'00z';
+  addLine('📡 Band: '+startCond.name+' ('+utcStr+' UTC) — '+startCond.desc,'sys');
   scheduleBandCond();
 }
 
@@ -4577,7 +5224,7 @@ function setAppMode(mode){
   if(mode==='cw') buildMorseVis();
   // Restart contest noise with correct mode (SSB vs CW sound)
   if(activeNoiseModes.has('contest') && audioCtx){ startContestNoise(); }
-  setDiff(difficulty);
+  adaptApplyLevel(adaptCurrentLevel, null);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -4595,8 +5242,6 @@ function toggleBlindMode(){
     btn.classList.remove('blind-on');
     btn.textContent = '👁 BLIND';
   }
-  // Re-render S&P panel so station buttons update immediately
-  if(typeof spRenderStationList === 'function') spRenderStationList();
   // Update waterfall overlay
   if(typeof wfUpdateOverlay === 'function') wfUpdateOverlay();
 }
@@ -4618,153 +5263,15 @@ function addLine(txt,cls){
 function setPile(n){for(let i=1;i<=5;i++)document.getElementById('pb'+i).classList.toggle('on',i<=n);}
 
 // ═══════════════════════════════════════════════════════════════════
-// S & P  MODE
-// In S&P mode the operator "tunes" across the band and calls
-// stations that are running CQ. Click a station in the S&P panel
-// to tune to it — it then sends "CQ TEST DE [CALL]", you copy the
-// call and enter it, then the exchange phase runs as normal.
-// ═══════════════════════════════════════════════════════════════════
-let sAndPMode = false;
-let spStations = [];      // pool of S&P-tunable stations (max 8)
-let spActive   = null;    // currently tuned station {call, exchange, zone, cat}
-let spCQLoop   = null;    // timer for the CQ repeat loop
-
-function toggleSPMode(){
-  sAndPMode = !sAndPMode;
-  const btn = document.getElementById('sp-toggle-btn');
-  const sec = document.getElementById('sp-stations-sec');
-  if(sAndPMode){
-    btn.textContent = 'S&P';
-    btn.classList.add('sp-on');
-    sec.style.display = 'block';
-    addLine('── S&P mode active: click a station to tune ──','sys');
-    if(sessActive && !paused) spRefreshBand();
-  } else {
-    btn.textContent = 'RUN';
-    btn.classList.remove('sp-on');
-    sec.style.display = 'none';
-    spStopCQLoop();
-    spActive = null;
-    addLine('── Running mode active ──','sys');
-    if(sessActive && !paused) nextQSO();
-  }
-}
-
-function spRefreshBand(){
-  if(!sAndPMode) return;
-  spStopCQLoop();
-  spActive = null;
-  const count = {easy:4, medium:6, ck:8}[difficulty] || 6;
-  spStations = [];
-  const used = new Set();
-  for(let i=0;i<count;i++){
-    let g, tries=0;
-    do{ g = genCallAdaptive(); tries++; }while(used.has(g.call) && tries<20);
-    used.add(g.call);
-    const exc = CONTESTS[contest] ? CONTESTS[contest].genEx(g.zone, g.call) : {rst:'59'};
-    spStations.push({call:g.call, exchange:exc, zone:g.zone, cat:g.cat||classifyCall(g.call)});
-  }
-  spRenderStationList();
-  // Rebuild waterfall with S&P signals
-  wfRebuildSignalsSP();
-  wfUpdateOverlay();
-}
-
-function spRenderStationList(){
-  const list = document.getElementById('sp-station-list');
-  if(!list) return;
-  list.innerHTML = '';
-  spStations.forEach((st, idx) => {
-    const btn = document.createElement('div');
-    btn.className = 'sp-station' + (spActive && spActive.call===st.call ? ' sp-active' : '');
-    const zoneInfo = (contest==='cqww') ? ' · Z'+st.zone : '';
-    if(blindMode){btn.textContent='📡 ???'+(contest==='cqww'?' · Z'+st.zone:'');}
-    else{btn.textContent = '📡 ' + st.call + zoneInfo;}
-    btn.onclick = () => spTuneTo(idx);
-    list.appendChild(btn);
-  });
-}
-
-function spTuneTo(idx){
-  if(!sessActive || paused || exPhase===2) return;
-  spStopCQLoop();
-  const st = spStations[idx];
-  if(!st) return;
-  spActive = st;
-  curQSO = {call:st.call, exchange:st.exchange, zone:st.zone, cat:st.cat};
-  exPhase = 1;
-  // Clear call input
-  const ci = document.getElementById('callinput');
-  if(ci){ ci.value=''; ci.classList.remove('ok2','err'); ci.focus(); }
-  showExPanel(false);
-  document.getElementById('input-label').textContent = T('call_input');
-  addLine('↓ Tune: '+st.call+' · CQ running','cq');
-  document.getElementById('cqst').textContent = blindMode ? 'Tune: ???' : 'Tune: '+st.call;
-  // Update S&P station list highlighting
-  spRenderStationList();
-  // Rebuild waterfall highlighting tuned station
-  wfRebuildSignalsSP();
-  wfUpdateOverlay();
-  // Speak the CQ (station is calling CQ)
-  spSpeakCQ();
-  armAutoSkip();
-}
-
-function spSpeakCQ(){
-  if(!spActive || exPhase!==1) return;
-  const phrases = [
-    'CQ test de '+callToSpeech(spActive.call, false),
-    'CQ CQ test de '+callToSpeech(spActive.call, false)+' '+callToSpeech(spActive.call, false),
-    'CQ contest de '+callToSpeech(spActive.call, false),
-  ];
-  const txt = rE(phrases);
-  speak(txt, spActive.call, ()=>{});
-}
-
-function spStopCQLoop(){
-  if(spCQLoop){ clearTimeout(spCQLoop); spCQLoop=null; }
-  cancelMain();
-}
-
-// Rebuild waterfall for S&P mode — each S&P station is a separate signal
-function wfRebuildSignalsSP(){
-  if(!sAndPMode){ wfRebuildSignals(); return; }
-  wfSignals = [];
-  // Background noise (same as normal)
-  const noiseDensity={band:1,contest:6,storm:2,aurora:3,fading:2};
-  let nc=1; for(const m of activeNoiseModes) nc+=(noiseDensity[m]||0);
-  const nr=(s)=>{let x=Math.sin(s+1)*10000;return x-Math.floor(x);};
-  for(let i=0;i<Math.min(nc,14);i++){
-    wfSignals.push({id:wfSignalId++,freqOff:(nr(i*7.3)-.5)*wfW*.88,
-      strength:6+nr(i*3.1)*22*(activeNoiseModes.has('contest')?2.2:1),
-      bw:1+nr(i*5.7)*5, type:'noise', label:'',
-      qsbFreq:.05+nr(i*2.9)*.18, qsbDepth:.3+nr(i*4.1)*.5, qsbPhase:nr(i*6.3)*Math.PI*2});
-  }
-  // Each S&P station as a separate signal on the band
-  const bandW = wfW * 0.85;
-  spStations.forEach((st, i) => {
-    const off = -bandW/2 + (i/(spStations.length-1||1))*bandW;
-    const isActive = spActive && spActive.call===st.call;
-    const str = isActive ? 62 : 30 + Math.random()*20;
-    wfSignals.push({
-      id:wfSignalId++, freqOff:off, strength:str, bw: isActive?14:8,
-      type: isActive?'main':'adj',
-      label: st.call,
-      qsbFreq:.06+i*.02, qsbDepth:isActive?.15:.4, qsbPhase:i*1.3
-    });
-  });
-}
-
-// After a QSO is logged in S&P mode, remove the worked station and refresh
-function spRemoveWorked(call){
-  spStations = spStations.filter(s=>s.call!==call);
-  // Add a new station to keep the band full
-  let g, tries=0;
-  const used = new Set(spStations.map(s=>s.call));
-  do{ g=genCallAdaptive(); tries++; }while(used.has(g.call)&&tries<20);
-  const exc = CONTESTS[contest] ? CONTESTS[contest].genEx(g.zone, g.call) : {rst:'59'};
-  spStations.push({call:g.call, exchange:exc, zone:g.zone, cat:g.cat||classifyCall(g.call)});
-  spRenderStationList();
+// ── Medium caller count (controlled by slider) ──
+function setMediumCallers(v){
+  v = parseInt(v)||2;
+  const el = document.getElementById('v-medium-callers');
+  if(el) el.textContent = v;
+  const hints = ['','1 Station ruft (sehr ruhig)','2 Stationen rufen gleichzeitig','3 Stationen rufen gleichzeitig','4 Stationen rufen gleichzeitig'];
+  const hint = document.getElementById('medium-callers-hint');
+  if(hint) hint.textContent = hints[v]||'';
+  if(difficulty==='medium') pileCount = v;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -5296,6 +5803,48 @@ function getExConfig(c){
       },
       getMult(){ return ex.state; },
     },
+    iaru:{
+      // Dynamic fields: HQ mode = enter "HQ", zone mode = enter zone number
+      get fields(){
+        if(ex.hq){
+          return [{id:'ex-f0', label:'HQ/ZONE', placeholder:'HQ', maxlen:2, type:'text', upper:true}];
+        }
+        return [{id:'ex-f0', get label(){ return T('fl_ituzone'); }, placeholder:'28', maxlen:2, type:'number', upper:false}];
+      },
+      get hint(){
+        return ex.hq
+          ? 'HQ-Station — Society: '+ex.hq.society+' · Enter "HQ"'
+          : T('hint_ituzone');
+      },
+      speak(qso, cb){
+        if(qso.exchange.hq){
+          speakExchangeSimple(qso,
+            ['Five nine.',
+             'H Q. '+qso.exchange.hq.society+'. Roger.'],
+            [45, 0], cb);
+        } else {
+          speakExchangeSimple(qso,
+            ['Five nine.',
+             String(qso.exchange.ituzone).split('').map(d=>NATO[d]||d).join(' ')+'. Roger.'],
+            [45, 0], cb);
+        }
+      },
+      logLine(qso){
+        return qso.exchange.hq
+          ? 'OK ✓ '+qso.call+' · HQ ('+qso.exchange.hq.society+') ★ MULT'
+          : 'OK ✓ '+qso.call+' · ITU Zone '+qso.exchange.ituzone;
+      },
+      validate(){
+        const v0 = document.getElementById('ex-f0').value.trim().toUpperCase();
+        if(ex.hq){
+          const ok0 = v0==='HQ';
+          return {ok:ok0, fields:[ok0], hint: ok0?'':'Enter HQ for HQ-Station'};
+        }
+        const ok0 = parseInt(v0,10) === parseInt(ex.ituzone,10);
+        return {ok:ok0, fields:[ok0], hint: ok0?'':T('ituzone_wrong')};
+      },
+      getMult(){ return ex.hq ? 'HQ_'+ex.hq.call : ex.ituzone; },
+    },
   };
   return cfgs[c] || cfgs.onlycall;
 }
@@ -5381,7 +5930,7 @@ function onExInput(e, fieldIdx){
         // else: stay on locator field, wait for Enter
       } else {
         const nextEl = document.getElementById(fields[fieldIdx+1].id);
-        if(nextEl) setTimeout(()=>{ nextEl.value=''; nextEl.focus(); }, 80);
+        if(nextEl) setTimeout(()=>{ nextEl.value=''; nextEl.focus(); try{nextEl.setSelectionRange(0,0);}catch(ex){} }, 80);
       }
     }
   }catch(ex){}
@@ -5443,10 +5992,8 @@ function submitExchange(){
     const loggedCall = curQSO.call;
     qsoLog.unshift({call:loggedCall,expected:loggedCall,bust:false,dupe:false,pts:getPts(),cat:curQSO.cat,zone:parseInt(curQSO.exchange&&curQSO.exchange.zone?curQSO.exchange.zone:curQSO.zone||0,10)});
     updLog();
-    // S&P: remove worked station, refresh band
-    if(sAndPMode) spRemoveWorked(loggedCall);
     // Residual pile-up: callers stay on frequency
-    if(!sAndPMode && lastPileCallers.length > 0 && rpileEnabled){
+    if(lastPileCallers.length > 0 && rpileEnabled){
       startResidualPile([...lastPileCallers]);
     }
     // Hide panel FIRST, then start next QSO — callinput gets clean focus
@@ -5562,26 +6109,14 @@ let lastPileCallers = [];
 function nextQSO(){
   if(!sessActive||paused) return;
   if(appMode==='cw'){nextCWItem();return;}
-  // ── S&P MODE: wait for user to click a station ──
-  if(sAndPMode){
-    showExPanel(false);
-    exPhase=0; curQSO=null; spActive=null;
-    stopActivePile(); stopResidualPile();
-    if(!spStations.length) spRefreshBand();
-    else spRenderStationList();
-    wfRebuildSignalsSP(); wfUpdateOverlay();
-    document.getElementById('cqst').textContent='S&P — Click station';
-    addLine('── Scan band: select a station in the S&P panel ──','sys');
-    const ci=document.getElementById('callinput');
-    if(ci){ci.value='';ci.classList.remove('ok2','err');ci.focus();}
-    return;
-  }
   // ── RUNNING MODE (original) ──
   showExPanel(false);
   exPhase=0;
   stopActivePile(); stopResidualPile();
+  cancelMain();              // v22: haengende AGAIN-Wiederholung sofort abbrechen
+  againRateOverride = null;  // v22: naechster Call wieder in normaler Rate
   const jitter=difficulty==='ck'?rI(0,2):difficulty==='medium'?rI(0,1):0;
-  const cnt=Math.min(5,pileCount+jitter);
+  const cnt=difficulty==='easy' ? 1 : Math.min(5,pileCount+jitter);
   const used=new Set(),callers=[];
   // ARRL DX: callers are W/VE stations (you work NA from DX side)
   const naPool=PREFIXES.filter(e=>e.p.some(p=>/^(W|K|N|AA|AB|AC|AD|VE|VA)/.test(p)));
@@ -5606,7 +6141,13 @@ function nextQSO(){
   const callerDataMap = {};
   callers.forEach(c => {
     const exc = (CONTESTS[contest]||CONTESTS.onlycall).genEx(c.zone, c.call);
-    callerDataMap[c.call.toUpperCase()] = {call:c.call, exchange:exc, zone:c.zone, cat:c.cat||classifyCall(c.call)};
+    // IARU: if exchange is an HQ station, override the call with the HQ callsign
+    let effectiveCall = c.call;
+    if(contest==='iaru' && exc.hq){
+      effectiveCall = exc.hq.call;
+      c.call = effectiveCall; // update callers array too
+    }
+    callerDataMap[effectiveCall.toUpperCase()] = {call:effectiveCall, exchange:exc, zone:c.zone, cat:c.cat||classifyCall(effectiveCall)};
   });
   const main=callers[0];
   const mainData = callerDataMap[main.call.toUpperCase()];
@@ -5628,6 +6169,12 @@ function nextQSO(){
   if(eli){eli.value='';eli.classList.remove('ok2','err');}
   // Hide exchange panel — only show AFTER callsign is confirmed
   showExPanel(false);
+  // S&P MODE: play CQ from found station, skip RUN pileup audio
+  if(opMode==='sp' && contest!=='onlycall'){
+    startSPFlow(curQSO, getExConfig(contest));
+    if(eli){eli.value=''; eli.focus();}
+    return;
+  }
 
   const voiceForMain = getVoiceForCall(main.call);
   // ── MEDIUM: Overlap- und Durcheinander-Szenarien ────────────────
@@ -5658,9 +6205,9 @@ function nextQSO(){
     }
   }
   if(mainStartDelay > 0){
-    setTimeout(()=> speakPartialCall(main.call, voiceForMain, ()=>{ markRXStart(cat); }), mainStartDelay);
+    setTimeout(()=> speakPartialCall(main.call, voiceForMain, ()=>{ markRXStart(mainData.cat); }), mainStartDelay);
   } else {
-    speakPartialCall(main.call, voiceForMain, ()=>{ markRXStart(cat); });
+    speakPartialCall(main.call, voiceForMain, ()=>{ markRXStart(mainData.cat); });
   }
   // Pile-up background callers — speak simultaneously with main
   if(cnt > 1){
@@ -5673,10 +6220,24 @@ function nextQSO(){
   }
   wfRebuildSignals(); wfUpdateOverlay();
   document.getElementById('cqst').textContent=blindMode?(cnt>1?'Pileup ×'+cnt+' · ???':'Calling: ???'):(cnt>1?'Pileup ×'+cnt+' · '+main.call:'Calling: '+main.call);
-  // Focus callinput with two attempts — 30ms and 200ms — to survive speechSynthesis focus steal
-  const _focusCI=()=>{ const inp=document.getElementById('callinput'); if(inp){inp.focus();inp.select();} };
-  setTimeout(_focusCI, 30);
-  setTimeout(_focusCI, 200);
+  // Focus callinput — multiple attempts to survive overlay-close + speechSynthesis focus steal
+  // Do NOT select() — that would mark existing text and cause the first typed char to overwrite it
+  const _focusCI=()=>{
+    const inp=document.getElementById('callinput');
+    if(!inp) return;
+    inp.focus();
+    const len=inp.value.length;
+    try{ inp.setSelectionRange(len,len); }catch(ex){}
+  };
+  // Attempt 1: immediate
+  _focusCI();
+  // Attempt 2: after overlay animation / speech synthesis may steal focus
+  setTimeout(_focusCI, 80);
+  // Attempt 3: longer safety net — only re-focus if field is still empty (user hasn't started typing)
+  setTimeout(()=>{
+    const inp=document.getElementById('callinput');
+    if(inp && document.activeElement!==inp && inp.value==='') _focusCI();
+  }, 350);
   armAutoSkip();
 }
 
@@ -5699,6 +6260,17 @@ function submitQSO(){
   if(!sessActive||paused) return;
   clearAutoSkip();
   initAudio();
+  // ── v21.1: Partial call query — input like "DL2?" / "?AB" / "?" ──
+  // Buchstaben/Ziffern + '?' → Call wird nochmals übermittelt (kein Bust)
+  {
+    const elq=document.getElementById('callinput');
+    const vq=(elq?elq.value.trim().toUpperCase():'');
+    if(/^(?=.*\?)[A-Z0-9/?]+$/.test(vq)){
+      if(elq){elq.value='';elq.focus();}
+      requestAgain();
+      return;
+    }
+  }
   if(appMode==='cw'){submitCW();return;}
   if(!curQSO) return;
 
@@ -5730,6 +6302,14 @@ function submitQSO(){
     if(isBust){
       beep(155,.22,.22);
       if(el){el.classList.add('err');setTimeout(()=>el.classList.remove('err'),1100);}
+      // Log bust so it appears in review and affects accuracy
+      sc.busts++;
+      document.getElementById('s-busts').textContent=sc.busts;
+      const tot0=sc.qso+sc.busts;
+      document.getElementById('s-acc').textContent=tot0>0?Math.round(sc.qso/tot0*100)+'%':'—';
+      qsoLog.unshift({call:entered,expected:curQSO.call,bust:true,dupe:false,pts:0,cat:curQSO.cat||''});
+      updLog();
+      updAdapt(false, curQSO.cat||'eu_short');
       // Show hint: list all recently heard calls if any, else standard bust
       if(heardCallsHistory.size > 0) {
         const recentList = [...heardCallsHistory.keys()].join(' · ');
@@ -5758,8 +6338,7 @@ function submitQSO(){
       document.getElementById('bbar-status').textContent=T('ok_call', entered);
       qsoLog.unshift({call:entered,expected:curQSO.call,bust:false,dupe:false,pts:getPts(),cat:curQSO.cat,zone:0});
       updLog();
-      if(sAndPMode) spRemoveWorked(entered);
-      if(!sAndPMode && lastPileCallers.length > 0 && rpileVol > 0){
+      if(lastPileCallers.length > 0 && rpileEnabled){
         startResidualPile([...lastPileCallers]);
       }
       exPhase=0; curQSO=null;
@@ -5767,6 +6346,10 @@ function submitQSO(){
       return;
     }
     addLine(T('ok_exch', entered),'sys');
+    if(opMode==='sp'){
+      startSPExchange(curQSO, getExConfig(contest));
+      return;
+    }
     exPhase=2;
     document.getElementById('input-label').textContent=T('exch_input');
     showExPanel(true, true);
@@ -5853,7 +6436,7 @@ function nextCWItem(){
   playCWString(item,wpm,cwTone,amp).then(()=>{
     document.getElementById('cqst').textContent=blindMode?'Sent: ???':'Sent: '+item;
   });
-  const inp=document.getElementById('callinput');if(inp){inp.focus();inp.select();}
+  const inp=document.getElementById('callinput');if(inp){inp.focus();const l=inp.value.length;try{inp.setSelectionRange(l,l);}catch(ex){}}
 }
 
 function submitCW(){
@@ -5895,29 +6478,328 @@ function skip(){
   if(!sessActive||paused) return;
   clearAutoSkip();
   cwPlaying=false;
-  spStopCQLoop();
-  try{speechSynthesis.cancel();}catch(e){}
-  if(sAndPMode){
-    addLine('── Skip · click next station ──','sys');
-    spActive=null; curQSO=null; exPhase=0;
-    showExPanel(false);
-    spRenderStationList();
-    wfRebuildSignalsSP(); wfUpdateOverlay();
-    document.getElementById('cqst').textContent='S&P — Click station';
+  try{cancelMain();}catch(e){}   // v19.1: stoppt Web-Speech UND ElevenLabs
+  // Log skip as bust so it shows in review and affects accuracy
+  if(curQSO){
+    sc.busts++;
+    document.getElementById('s-busts').textContent=sc.busts;
+    const tot=sc.qso+sc.busts;
+    document.getElementById('s-acc').textContent=tot>0?Math.round(sc.qso/tot*100)+'%':'—';
+    qsoLog.unshift({call:'—',expected:curQSO.call,bust:true,dupe:false,pts:0,cat:curQSO.cat||'',skipped:true});
+    updLog();
+    updAdapt(false, curQSO.cat||'eu_short');
+    addLine('⏭ '+T('skipped')+' ('+curQSO.call+')','sys');
   } else {
     addLine(T('skipped'),'sys');
-    curQSO=null;cwExpected='';
-    setTimeout(nextQSO,200);
   }
+  curQSO=null; cwExpected='';
+  setTimeout(nextQSO,200);
 }
 
 function updLog(){
   try{
-    const rows=qsoLog.slice(0,30).map(e=>`<tr class="${e.bust?'bust':e.dupe?'dupe':''}"><td style="color:${e.bust?'var(--red)':'var(--acc)'}">${e.call}</td><td style="color:var(--acc4)">${e.bust?'':'+'+e.pts}</td><td><span class="bdg ${e.dupe?'bdupe':e.bust?'bbust':'bok'}">${e.dupe?'D':e.bust?'B':'✓'}</span></td></tr>`).join('');
+    function diffCalls(typed, expected){
+      // Returns HTML with char-level diff highlight
+      const t = (typed||'').toUpperCase();
+      const e = (expected||'').toUpperCase();
+      // Align char by char (simple positional diff, works great for callsigns)
+      let out = '';
+      const maxLen = Math.max(t.length, e.length);
+      for(let i=0;i<maxLen;i++){
+        const tc = t[i]||'';
+        const ec = e[i]||'';
+        if(tc && tc===ec){
+          out += '<span style="color:var(--acc)">'+tc+'</span>';
+        } else if(tc && !ec){
+          out += '<span style="color:var(--red);text-decoration:line-through">'+tc+'</span>';
+        } else if(!tc && ec){
+          out += '<span style="color:var(--acc4)">'+ec+'</span>';
+        } else {
+          out += '<span style="color:var(--red)">'+tc+'</span><span style="color:var(--acc4);font-size:9px">'+ec+'</span>';
+        }
+      }
+      return out;
+    }
+    const rows=qsoLog.slice(0,30).map(e=>{
+      let callCell;
+      if(e.skipped){
+        callCell = `<span style="color:var(--txt3)">⏭ <span style="font-size:9px">${e.expected||'?'}</span></span>`;
+      } else if(e.bust && e.expected){
+        callCell = diffCalls(e.call, e.expected);
+      } else {
+        callCell = `<span style="color:${e.bust?'var(--red)':'var(--acc)'}">${e.call}</span>`;
+      }
+      return `<tr class="${e.bust?'bust':e.dupe?'dupe':''}"><td>${callCell}</td><td style="color:var(--acc4)">${e.bust?'':'+'+e.pts}</td><td><span class="bdg ${e.dupe?'bdupe':e.bust?'bbust':'bok'}">${e.dupe?'D':e.bust?'B':'✓'}</span></td></tr>`;
+    }).join('');
     document.getElementById('logt').innerHTML='<tr><th>Call</th><th>Pts</th><th></th></tr>'+rows;
   }catch(e){}
 }
 
+
+
+
+// ═══════════════════════════════════════════════════════════════════
+// MINUTE-ADAPTIVE SYSTEM
+// Every 60s: count QSOs in last minute → raise/lower difficulty
+// Targets: aim for ~10 QSOs/min (easy start). Auto-adjusts pileup,
+// speed (SSB rate), caller count, noise level, and internal difficulty.
+// ═══════════════════════════════════════════════════════════════════
+
+let adaptMinuteTimer = null;
+let adaptLastMinuteQSO = 0;
+let adaptCurrentLevel = 0;   // 0–10 integer scale, starts low
+let adaptQSOHistory   = [];  // QSOs per minute, last 5 minutes
+
+// Level → named difficulty
+function adaptLevelToDiff(lvl){
+  if(lvl <= 3) return 'easy';
+  if(lvl <= 7) return 'medium';
+  return 'ck';
+}
+
+// Apply a numeric level (0–10) to all engine parameters
+function adaptApplyLevel(lvl, reason){
+  adaptCurrentLevel = Math.max(0, Math.min(10, lvl));
+  const d = adaptLevelToDiff(adaptCurrentLevel);
+
+  // --- Internal difficulty string (used throughout engine) ---
+  difficulty = d;
+
+  // --- Pileup count: level 0=1 caller … level 10=4 callers (v22: flacherer Anstieg) ---
+  pileCount = Math.max(1, Math.round(1 + adaptCurrentLevel * 0.25));
+  // v19.2: Im MEDIUM-Modus hat der RUFER-Slider Vorrang (konsistent mit endBandEvent)
+  if(d==='medium'){
+    const mc = parseInt((document.getElementById('s-medium-callers')||{value:'0'}).value)||0;
+    if(mc>0) pileCount = mc;
+  }
+
+  // --- Pile density: level 0=1 … level 10=6 (v22: flacherer Anstieg) ---
+  pileDensity = Math.max(1, Math.round(1 + adaptCurrentLevel * 0.5));
+  const ds = document.getElementById('s-pile-density');
+  if(ds){ ds.value = pileDensity; document.getElementById('v-pile-density').textContent = String(pileDensity); }
+
+  // --- SSB speech speed (spd slider 50–200): level 0=70 … level 10=160 ---
+  const newSpd = Math.round(70 + adaptCurrentLevel * 9);
+  spd = newSpd;
+  const spdSlider = document.getElementById('s-spd');
+  if(spdSlider){ spdSlider.value = newSpd; document.getElementById('v-spd').textContent = String(newSpd); }
+
+  // --- RF filter: easy→light, medium→medium, ck→heavy ---
+  const autoFilt = {easy:3, medium:5, ck:8}[d];
+  rfFiltLevel = autoFilt;
+  const filtSlider = document.getElementById('s-rfilt');
+  if(filtSlider){ filtSlider.value = autoFilt; document.getElementById('v-rfilt').textContent = autoFilt; }
+  if(audioCtx) try{ buildSSBChain(); }catch(e){}
+  if(typeof updateRFiltLabel === 'function') updateRFiltLabel();
+
+  // --- Noise profile ---
+  let noiseSet;
+  if(d==='easy')        noiseSet = ['band'];
+  else if(d==='medium') noiseSet = ['band','contest'];
+  else                  noiseSet = ['band','contest','fading'];
+  activeNoiseModes = new Set(noiseSet);
+  if(audioCtx){ try{ stopAllNoise(); noiseSet.forEach(m=>startNoise(m)); }catch(e){} }
+  ['band','contest','storm','aurora','fading'].forEach(t=>{
+    const btn=document.getElementById('nb-'+t);
+    if(btn) btn.classList.toggle('on', activeNoiseModes.has(t));
+  });
+  if(typeof updateNoiseLabel==='function') updateNoiseLabel();
+  if(typeof wfRebuildSignals==='function'){ try{ wfRebuildSignals(); wfUpdateOverlay(); }catch(e){} }
+
+  // --- UI: bottom bar difficulty badge ---
+  const bbarDiff = document.getElementById('bbar-diff');
+  if(bbarDiff){
+    const lvlNames = ['EASY','EASY','EASY','EASY','MED','MED','MED','MED','HARD','HARD','HARD'];
+    bbarDiff.textContent = '● LVL '+adaptCurrentLevel+' · '+lvlNames[adaptCurrentLevel];
+    bbarDiff.style.color = d==='easy'?'var(--acc2)': d==='medium'?'var(--acc)':'var(--red)';
+  }
+
+  // --- UI: left panel adaptive status ---
+  const statBar = document.getElementById('adapt-status-bar');
+  const statDet = document.getElementById('adapt-status-detail');
+  if(statBar){
+    const stars = '●'.repeat(Math.round(adaptCurrentLevel/2)+1).padEnd(6,'○');
+    statBar.style.color = d==='easy'?'var(--acc2)': d==='medium'?'var(--acc)':'var(--red)';
+    statBar.textContent = 'Level '+adaptCurrentLevel+'/10  '+stars;
+  }
+  if(statDet && reason){
+    const last = adaptQSOHistory.slice(-3).join(' → ');
+    statDet.textContent = reason + (last?' · QSOs/min: '+last:'');
+  }
+}
+
+// Called every 60 seconds while session is active
+function adaptMinuteTick(){
+  if(!sessActive || paused) return;
+  const now = Date.now();
+  const cutoff = now - 60000;
+  // Count QSOs logged in last 60 seconds
+  const qInMin = qsoTimestamps.filter(t => t >= cutoff).length;
+  adaptQSOHistory.push(qInMin);
+  if(adaptQSOHistory.length > 10) adaptQSOHistory.shift();
+
+  // Target: 10 QSOs/min = perfect. Scale: +1 level if ≥10, -1 if <5, ±0 otherwise
+  // Use rolling average of last 2 minutes for smoother adaptation
+  const recent = adaptQSOHistory.slice(-2);
+  const avgQ = recent.reduce((a,b)=>a+b,0) / recent.length;
+
+  let delta = 0;
+  let reason = '';
+  if(avgQ >= 12){      delta = +2; reason = '🔥 Sehr gut! Schwieriger →'; }
+  else if(avgQ >= 10){ delta = +1; reason = '↑ Gut! Level erhöht'; }
+  else if(avgQ >= 7){  delta =  0; reason = '= Level gehalten ('+avgQ.toFixed(1)+' QSOs/min)'; }
+  else if(avgQ >= 4){  delta = -1; reason = '↓ Level reduziert'; }
+  else {               delta = -2; reason = '⬇ Weniger Druck →'; }
+
+  const newLvl = adaptCurrentLevel + delta;
+  adaptApplyLevel(newLvl, reason);
+
+  // Flash status
+  const el = document.getElementById('adapt-status-bar');
+  if(el){ el.style.opacity='0.4'; setTimeout(()=>{ if(el) el.style.opacity='1'; }, 400); }
+}
+
+function startAdaptTimer(){
+  stopAdaptTimer();
+  adaptLastMinuteQSO = sc.qso || 0;
+  adaptMinuteTimer = setInterval(()=>{
+    try{ adaptMinuteTick(); }catch(e){ console.warn('adaptTick error',e); }
+  }, 60000);
+}
+
+function stopAdaptTimer(){
+  if(adaptMinuteTimer){ clearInterval(adaptMinuteTimer); adaptMinuteTimer = null; }
+  adaptQSOHistory = [];
+}
+
+// ── AUTO-ADAPT 45s ──────────────────────────────────────────────
+let autoAdaptOn       = false;
+let autoAdaptTimer    = null;   // setInterval handle
+let autoAdaptCountdown= 45;     // seconds remaining until next tick
+let autoAdaptCountInt = null;   // 1-second interval for countdown display
+
+const AA_INTERVAL = 45; // seconds
+
+function toggleAutoAdapt(){
+  autoAdaptOn = !autoAdaptOn;
+  const btn = document.getElementById('aa-btn');
+  const cd  = document.getElementById('aa-countdown');
+  if(btn){ btn.classList.toggle('on', autoAdaptOn); }
+  if(cd){  cd.classList.toggle('hidden', !autoAdaptOn); }
+  if(autoAdaptOn){
+    startAutoAdaptTimer();
+  } else {
+    stopAutoAdaptTimer();
+  }
+}
+
+function startAutoAdaptTimer(){
+  stopAutoAdaptTimer();
+  autoAdaptCountdown = AA_INTERVAL;
+  updateAACountdownUI(AA_INTERVAL);
+  // Main 45s tick
+  autoAdaptTimer = setInterval(()=>{
+    if(!sessActive || paused) return;
+    autoAdaptTick45();
+    autoAdaptCountdown = AA_INTERVAL;
+    updateAACountdownUI(AA_INTERVAL);
+  }, AA_INTERVAL * 1000);
+  // 1-second countdown display
+  autoAdaptCountInt = setInterval(()=>{
+    if(!sessActive || paused) return;
+    autoAdaptCountdown = Math.max(0, autoAdaptCountdown - 1);
+    updateAACountdownUI(autoAdaptCountdown);
+  }, 1000);
+}
+
+function stopAutoAdaptTimer(){
+  if(autoAdaptTimer)    { clearInterval(autoAdaptTimer);    autoAdaptTimer    = null; }
+  if(autoAdaptCountInt) { clearInterval(autoAdaptCountInt); autoAdaptCountInt = null; }
+  updateAACountdownUI(AA_INTERVAL);
+}
+
+function updateAACountdownUI(sec){
+  const num = document.getElementById('aa-num');
+  const arc = document.getElementById('aa-arc');
+  if(num) num.textContent = sec;
+  if(arc){
+    // circumference = 2π×11 ≈ 69.1; full = 0, empty = 69.1
+    const pct = sec / AA_INTERVAL;
+    arc.style.strokeDashoffset = (69.1 * (1 - pct)).toFixed(2);
+  }
+}
+
+// The actual 45s adapt tick — uses QSOs in last 45 seconds
+function autoAdaptTick45(){
+  const now    = Date.now();
+  const cutoff = now - (AA_INTERVAL * 1000);
+  const qIn45  = qsoTimestamps.filter(t => t >= cutoff).length;
+
+  // Scale to per-minute equivalent for comparison with existing thresholds
+  const qPerMin = (qIn45 / AA_INTERVAL) * 60;
+
+  let delta = 0, reason = '';
+  if     (qPerMin >= 12){ delta = +2; reason = '🔥 Top-Rate! Schwieriger →'; }
+  else if(qPerMin >= 10){ delta = +1; reason = '↑ Gut! Speed erhöht ('+qIn45+' QSOs/45s)'; }
+  else if(qPerMin >=  7){ delta =  0; reason = '= Speed gehalten ('+qIn45+' QSOs/45s)'; }
+  else if(qPerMin >=  4){ delta = -1; reason = '↓ Speed reduziert ('+qIn45+' QSOs/45s)'; }
+  else                  { delta = -2; reason = '⬇ Viel langsamer → ('+qIn45+' QSOs/45s)'; }
+
+  adaptApplyLevel(adaptCurrentLevel + delta, reason);
+
+  // Flash countdown arc briefly
+  const arc = document.getElementById('aa-arc');
+  if(arc){
+    arc.style.stroke = 'var(--acc4)';
+    setTimeout(()=>{ if(arc) arc.style.stroke = 'var(--acc)'; }, 600);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// DIFFICULTY PRESET SELECTOR
+// ═══════════════════════════════════════════════════════════════════
+let diffPreset = 'easy'; // selected preset: 'easy' | 'advanced' | 'ck'
+
+const DIFF_PRESET_DESCS = {
+  easy:     'Eine Station · starkes Signal · kein QRM',
+  advanced: '2–3 Stationen · moderates QRM · normaler Contest',
+  ck:       'Volles Pile-Up · starkes QRM · lösbar mit Technik'
+};
+
+const DIFF_PRESET_STARTLEVEL = { easy: 2, advanced: 3, ck: 8 };
+
+// Pile-Up OFF for easy, limited for advanced, full for ck
+const DIFF_PRESET_RPILE = { easy: false, advanced: true, ck: true };
+
+function selectDiffPreset(preset){
+  if(sessActive) return; // no change mid-session
+  diffPreset = preset;
+
+  // Update card visuals
+  ['easy','advanced','ck'].forEach(p => {
+    const c = document.getElementById('dpc-'+p);
+    if(c) c.classList.toggle('active', p === preset);
+  });
+
+  // Update description line
+  const desc = document.getElementById('diff-preset-desc');
+  if(desc) desc.textContent = DIFF_PRESET_DESCS[preset] || '';
+
+  // Pre-configure pile-up toggle to match preset
+  const rpileBtn = document.getElementById('rpile-toggle');
+  const wantRpile = DIFF_PRESET_RPILE[preset];
+  if(typeof rpileEnabled !== 'undefined'){
+    if(rpileEnabled !== wantRpile && typeof toggleRpile === 'function'){
+      toggleRpile(); // sync toggle state
+    }
+  }
+
+  // Pre-apply level so UI sliders reflect the preset before START
+  adaptApplyLevel(DIFF_PRESET_STARTLEVEL[preset], 'Preset: '+preset.toUpperCase());
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════
 // SESSION CONTROL - Start / Pause / Stop
 // ═══════════════════════════════════════════════════════════════════
@@ -5926,6 +6808,21 @@ function startSess(){
   try{loadVoices();}catch(e){}
   if(appMode==='cw') buildMorseVis();
   sessActive=true; paused=false; sessStart=Date.now(); totalPaused=0;
+  // ── v19.1 FIX: Stats immer frisch starten (STOP→START ohne CLEAR
+  //    hat vorher QSOs/Busts/Punkte der alten Session mitgenommen und
+  //    beim nächsten Stop kumulierte Werte ins Leaderboard geschrieben) ──
+  sc={qso:0,pts:0,mults:0,dupes:0,busts:0};
+  qsoLog=[]; rateHist=[]; qsoTimestamps=[];
+  mulSet=new Set(); callSet=new Set();
+  try{
+    ['s-qso','s-mults','s-busts'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='0';});
+    ['s-acc','s-errate'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='—';});
+    const sr=document.getElementById('s-rate'); if(sr)sr.textContent='0';
+    const bs=document.getElementById('big-score'); if(bs)bs.textContent='0';
+    const pq=document.getElementById('proj-qso'); if(pq)pq.textContent='—';
+    const ps=document.getElementById('proj-score'); if(ps)ps.textContent='—';
+    updLog(); drawRG();
+  }catch(e){}
   callPersonaMap.clear();
   callVoiceMap.clear();   // fresh voice assignments each session
   callQSBMap.clear();     // fresh QSB envelopes each session
@@ -5939,12 +6836,13 @@ function startSess(){
   document.getElementById('btn-stop').style.display='block';
   document.getElementById('btn-pause').style.display='block';
   document.getElementById('rx-led').classList.add('rx');
+  // Lock difficulty preset cards during session
+  const dps = document.getElementById('diff-preset-sec');
+  if(dps) dps.classList.add('diff-preset-sec-locked');
+
   const modeStr=appMode==='cw'?'CW ':CONTESTS[contest].name+' ';
-  addLine(T('sess_start', modeStr, {easy:'EASY',medium:'MEDIUM',ck:'CONTEST KING'}[difficulty]),'cq');
-  if(difficulty==='easy') addLine(T('diff_easy'),'sys');
-  if(difficulty==='medium') addLine(T('diff_medium'),'sys');
-  if(difficulty==='ck'){
-    addLine(T('diff_ck'),'sys');
+  addLine(T('sess_start', modeStr, {easy:'EASY',medium:'MEDIUM',ck:'CONTEST KING'}[difficulty]+' ('+{easy:'EASY',advanced:'ADVANCED',ck:'CONTEST KING'}[diffPreset]+')'),'cq');
+  {
   }
   // Log SSB filter state
   if(rfFiltLevel > 0 && appMode === 'ssb'){
@@ -5952,10 +6850,13 @@ function startSess(){
     addLine(T('rf_filter', lbl, difficulty!=='easy'?'ON':'OFF'),'sys');
   }
   sessTimer=setInterval(()=>{updTimer();updSM();},500);
-  // Reset S&P band if S&P mode active
+  // Start at preset level, then adapt each minute
+  const presetLvl = DIFF_PRESET_STARTLEVEL[diffPreset] || 2;
+  const presetNames = {easy:'EASY',advanced:'ADVANCED',ck:'CONTEST KING'};
+  adaptApplyLevel(presetLvl, 'Gestartet: '+presetNames[diffPreset]+' — passt sich jede Minute an');
+  startAdaptTimer();
   lastPileCallers=[]; stopActivePile(); stopResidualPile();
   clearHeardCallsHistory();
-  if(sAndPMode){ spStations=[]; }
   wfRebuildSignals(); wfUpdateOverlay();
   if(difficulty==='ck') startBandEvents();
   startBandSim();   // band opening simulation — all difficulties
@@ -5974,7 +6875,8 @@ function pauseSess(){
     paused=true;
     pausedAt=Date.now();
     cwPlaying=false;
-    try{speechSynthesis.cancel();}catch(e){}
+    try{cancelMain();}catch(e){}   // v19.1: stoppt Web-Speech UND ElevenLabs
+    stopActivePile(); stopResidualPile();
     document.getElementById('btn-pause').textContent='▶ RESUME';
     document.getElementById('btn-pause').style.borderColor='var(--acc2)';
     document.getElementById('btn-pause').style.color='var(--acc2)';
@@ -5995,15 +6897,18 @@ function pauseSess(){
 }
 
 function stopSess(){
-  sessActive=false; paused=false; cwPlaying=false;
+  sessActive=false; paused=false;
+  stopAdaptTimer();
+  stopAutoAdaptTimer();
+  cwPlaying=false;
   clearAutoSkip();
-  try{speechSynthesis.cancel();}catch(e){}
+  try{cancelMain();}catch(e){}   // v19.1: stoppt Web-Speech UND ElevenLabs
   stopQSBLFO();
   stopBandEvents();
   stopBandSim();
   stopChaos(); stopAllNoise();
-  stopActivePile(); stopResidualPile(); spStopCQLoop();
-  spActive=null; lastPileCallers=[]; clearHeardCallsHistory();
+  stopActivePile(); stopResidualPile();
+  lastPileCallers=[]; clearHeardCallsHistory();
   wfRebuildSignals(); wfUpdateOverlay();
   try{if(audioCtx) activeNoiseModes.forEach(m=>startNoise(m));}catch(e){}
   clearInterval(sessTimer); stopKA();
@@ -6022,6 +6927,10 @@ function stopSess(){
   document.getElementById('cqst').textContent='';
   addLine(T('sess_end'),'sys');
   saveToLB();
+  // Unlock difficulty preset cards
+  const dps2 = document.getElementById('diff-preset-sec');
+  if(dps2) dps2.classList.remove('diff-preset-sec-locked');
+
 }
 
 function clearSess(){
@@ -6087,6 +6996,9 @@ function saveToLB(){
       mode:appMode.toUpperCase(), diff:difficulty,
       level:lv.name, ts:Date.now(),
       duration:el, qso:sc.qso, busts:sc.busts, mults:sc.mults,
+      skips:qsoLog.filter(function(e){return e.skipped;}).length,
+      agains:sc.agains||0,
+      contest:contest,
       eloAvg:eloAvgVal, xp:adapt.xp,
       weekday:now.getDay(), hour:now.getHours(),
       dateStr:now.toISOString().slice(0,10),
@@ -6106,6 +7018,49 @@ function saveToLB(){
     leaderboard=leaderboard.slice(0,200);
     localStorage.setItem('hf_trainer_lb_v31',JSON.stringify(leaderboard));
   }catch(e){console.warn('saveToLB:',e);}
+}
+
+// ── CSV Export: alle Sessions als Download ──────────────────────────
+function exportSessionsCSV(){
+  try{
+    loadLB();
+    if(!leaderboard||leaderboard.length===0){
+      alert('Keine Sessions vorhanden. Bitte zuerst eine Session abschließen.');
+      return;
+    }
+    const cols=['date','call','mode','diff','qso','busts','acc','rate','score','mults','duration_s','eloAvg','xp','level','weekday','hour','contest'];
+    const rows=[cols.join(',')];
+    leaderboard.forEach(function(s){
+      const dur=s.duration||0;
+      rows.push([
+        s.dateStr||new Date(s.ts).toISOString().slice(0,10),
+        s.call||'',
+        s.mode||'',
+        s.diff||'',
+        s.qso||0,
+        s.busts||0,
+        s.acc||0,
+        s.rate||0,
+        s.score||0,
+        s.mults||0,
+        dur,
+        s.eloAvg||0,
+        s.xp||0,
+        (s.level||'').replace(/,/g,' '),
+        s.weekday!=null?s.weekday:'',
+        s.hour!=null?s.hour:'',
+        (s.contest||'').replace(/,/g,' ')
+      ].join(','));
+    });
+    const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const dateStr=new Date().toISOString().slice(0,10);
+    a.href=url; a.download='hfct_sessions_'+dateStr+'.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+    addLine('⬇ '+leaderboard.length+' Sessions exportiert → hfct_sessions_'+dateStr+'.csv','sys');
+  }catch(e){console.warn('exportCSV:',e);}
 }
 function setLBTab(t){
   lbTab=t;
@@ -6191,6 +7146,13 @@ function showReview(){
       }catch(e){}
     }
 
+    // ── Avg reaction time across all categories ──
+    const allCats = Object.keys(CALL_CATS);
+    const rtVals = allCats.map(c=>eloAvgRT(c)).filter(v=>v!=null);
+    const avgRTms = rtVals.length ? Math.round(rtVals.reduce((a,b)=>a+b,0)/rtVals.length) : null;
+    const avgRTstr = avgRTms ? (avgRTms/1000).toFixed(1)+'s' : '—';
+    const skips = qsoLog.filter(e=>e.skipped).length;
+
     document.getElementById('rev-grid').innerHTML=`
       <div class="rev-card"><div class="rev-val" style="color:var(--acc)">${fs.toLocaleString()}</div><div class="rev-lbl">Final Score</div></div>
       <div class="rev-card"><div class="rev-val" style="color:var(--acc2)">${sc.qso}</div><div class="rev-lbl">Correct QSOs</div></div>
@@ -6200,6 +7162,8 @@ function showReview(){
       <div class="rev-card"><div class="rev-val" style="color:var(--red)">${erph}</div><div class="rev-lbl">Errors/Hour</div></div>
       <div class="rev-card"><div class="rev-val" style="color:var(--acc4)">${pq}</div><div class="rev-lbl">Proj. QSO/h</div></div>
       <div class="rev-card"><div class="rev-val" style="color:var(--acc4);font-size:14px">${ps}</div><div class="rev-lbl">Proj. Score/h</div></div>
+      <div class="rev-card"><div class="rev-val" style="color:var(--purple)">${avgRTstr}</div><div class="rev-lbl">Avg React Time</div></div>
+      <div class="rev-card"><div class="rev-val" style="color:var(--txt2)">${skips}</div><div class="rev-lbl">Skipped</div></div>
       ${vsHtml}
     `;
 
@@ -6661,14 +7625,12 @@ function anDrawTime(body, sessions){
 }
 
 function anDrawErrors(body, sessions){
-  // Aggregate char busts
   var charMap={};
   sessions.forEach(function(s){
     if(s.charBusts) Object.keys(s.charBusts).forEach(function(ch){
       charMap[ch]=(charMap[ch]||0)+s.charBusts[ch];
     });
   });
-
   var catBustMap={}, catTotalMap={};
   sessions.forEach(function(s){
     if(s.catBusts) Object.keys(s.catBusts).forEach(function(c){
@@ -6678,11 +7640,32 @@ function anDrawErrors(body, sessions){
       catTotalMap[c]=(catTotalMap[c]||0)+s.catTotal[c];
     });
   });
-
+  var last20=sessions.slice(-20);
+  var skipArr=last20.map(function(s){return s.skips||0;});
+  var bustArr=last20.map(function(s){return s.busts||0;});
+  var dates20=last20.map(function(s){return anFmtDate(s.ts);});
+  var totalSkips=sessions.reduce(function(a,s){return a+(s.skips||0);},0);
+  var totalBusts=sessions.reduce(function(a,s){return a+(s.busts||0);},0);
+  var contestMap={};
+  sessions.forEach(function(s){
+    var k=s.contest||'?';
+    if(!contestMap[k]) contestMap[k]={qso:0,sessions:0,bestAcc:0};
+    contestMap[k].qso+=(s.qso||0);
+    contestMap[k].sessions++;
+    contestMap[k].bestAcc=Math.max(contestMap[k].bestAcc,(s.acc||0));
+  });
   var allChars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
   var maxBust=Math.max.apply(null,allChars.map(function(c){return charMap[c]||0;}))||1;
-
   var html='';
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">';
+  html+=anCard(totalBusts,'Total Busts','var(--red)');
+  html+=anCard(totalSkips,'Total Skipped','var(--txt2)');
+  html+=anCard(sessions.length?Math.round(totalBusts/sessions.length):'—','Busts/Session','var(--acc4)');
+  html+='</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+  html+=anChartBox('Busts/Session','an-c-busts','','var(--red)','Total '+totalBusts,'Avg '+anAvg(bustArr)+'/sess','Last '+bustArr[bustArr.length-1]);
+  html+=anChartBox('Skips/Session','an-c-skips','','var(--txt2)','Total '+totalSkips,'Avg '+anAvg(skipArr)+'/sess','Last '+skipArr[skipArr.length-1]);
+  html+='</div>';
   html+='<div style="font-family:var(--fui);font-size:8px;letter-spacing:2px;color:var(--txt3);margin-bottom:8px">'+T('an_char_heatmap')+' <span style="font-size:7px">'+T('an_char_sub')+'</span></div>';
   html+='<div style="display:flex;flex-wrap:wrap;gap:3px;background:var(--bg0);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:10px;margin-bottom:12px">';
   for(var ci=0;ci<allChars.length;ci++){
@@ -6695,7 +7678,6 @@ function anDrawErrors(body, sessions){
     html+='<div title="'+ch+': '+n+' Busts" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:3px;background:'+bg+';color:'+tc+';font-family:var(--fui);font-size:11px;font-weight:600;cursor:default;border:1px solid rgba(0,0,0,.15)">'+ch+'</div>';
   }
   html+='</div>';
-
   html+='<div style="font-family:var(--fui);font-size:8px;letter-spacing:2px;color:var(--txt3);margin-bottom:8px">'+T('an_acc_by_cat')+'</div>';
   html+='<div style="background:var(--bg0);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:10px;margin-bottom:8px">';
   var catKeys=Object.keys(CALL_CATS);
@@ -6715,8 +7697,19 @@ function anDrawErrors(body, sessions){
     html+='</div>';
   }
   html+='</div>';
-
-  // Top problem chars
+  var cKeys=Object.keys(contestMap);
+  if(cKeys.length>1){
+    html+='<div style="font-family:var(--fui);font-size:8px;letter-spacing:2px;color:var(--txt3);margin-bottom:6px">CONTEST BREAKDOWN</div>';
+    html+='<div style="background:var(--bg0);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:10px;margin-bottom:8px">';
+    cKeys.sort(function(a,b){return contestMap[b].qso-contestMap[a].qso;}).forEach(function(k){
+      var cm=contestMap[k];
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">';
+      html+='<span style="font-family:var(--fui);font-size:9px;color:var(--acc4);width:70px;flex-shrink:0">'+k.toUpperCase()+'</span>';
+      html+='<span style="font-size:9px;color:var(--txt2)">'+cm.sessions+'x · '+cm.qso+' QSO · best '+cm.bestAcc+'%</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
   var sorted=Object.keys(charMap).sort(function(a,b){return charMap[b]-charMap[a];}).slice(0,8);
   if(sorted.length){
     html+='<div style="font-size:9px;color:var(--txt3);font-family:var(--fui)">'+T('an_top_prob');
@@ -6725,10 +7718,13 @@ function anDrawErrors(body, sessions){
     }
     html+='</div>';
   }
-
   body.innerHTML=html;
+  setTimeout(function(){
+    var c;
+    c=document.getElementById('an-c-busts'); if(c){c.width=c.offsetWidth;anLineChart(c,bustArr,'--red',0,null,dates20);}
+    c=document.getElementById('an-c-skips'); if(c){c.width=c.offsetWidth;anLineChart(c,skipArr,'--txt2',0,null,dates20);}
+  },40);
 }
-
 function anDrawElo(body, sessions){
   var cats=Object.keys(CALL_CATS);
   var snapSessions=sessions.filter(function(s){return s.eloSnap;});
@@ -6856,7 +7852,6 @@ function doLogin(){
     document.getElementById('bbar-call').textContent=val;
     document.getElementById('bbar-status').textContent=T('ready');
     document.getElementById('exinfo').textContent=getExInfo(contest);
-    document.getElementById('adapt-hint').textContent=T('adapt_active');
     // Update localised button labels
     try{
       const wb=document.getElementById('mod-weak-name');
@@ -6890,6 +7885,347 @@ document.getElementById('login-loc').addEventListener('input',function(){
 // ═══════════════════════════════════════════════════════════════════
 // KEYBOARD - Mac optimized
 // ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// VOICE INPUT SYSTEM v2 — continuous recognition, one-time permission
+// Handles: callsign entry, exchange entry, voice commands
+// Commands: "your call again" → repeat call (no pile-up)
+//           "your locator please" → repeat locator only
+//           partial callsign heard → repeat call (no pile-up)
+// ═══════════════════════════════════════════════════════════════════
+let vadActive        = false;   // user toggled ON
+let vadListening     = false;   // SR instance running
+let vadRecognition   = null;    // single persistent SpeechRecognition
+let vadPermission    = false;   // mic permission already granted
+let vadAutoConfirm   = true;    // auto-press Enter after recognition
+let vadConfirmTimer  = null;    // delay before auto-confirm
+let vadCmdCooldown   = false;   // block double-fire of commands
+const VAD_CONFIRM_MS = 1400;    // ms of silence before auto-confirm
+
+// NATO phonetic → letter map
+const NATO_TO_LETTER = {
+  alpha:'A',alfa:'A',bravo:'B',charlie:'C',delta:'D',echo:'E',foxtrot:'F',
+  golf:'G',hotel:'H',india:'I',juliett:'J',juliet:'J',kilo:'K',lima:'L',
+  mike:'M',november:'N',oscar:'O',papa:'P',quebec:'Q',romeo:'R',sierra:'S',
+  tango:'T',uniform:'U',victor:'V',whiskey:'W','x-ray':'X',xray:'X',
+  yankee:'Y',zulu:'Z',
+  zero:'0',one:'1',two:'2',three:'3',four:'4',five:'5',six:'6',
+  seven:'7',eight:'8',nine:'9',niner:'9'
+};
+
+function natoToCallsign(transcript) {
+  let t = transcript.toLowerCase().replace(/[.,!?;:]/g,'').trim();
+  const words = t.split(/\s+/);
+  let result = '';
+  for(const w of words){
+    if(NATO_TO_LETTER[w] !== undefined){
+      result += NATO_TO_LETTER[w];
+    } else if(w.length === 1 && /[a-z0-9]/.test(w)){
+      result += w.toUpperCase();
+    } else if(/^\d+$/.test(w)){
+      result += w;
+    }
+  }
+  return result || t.toUpperCase().replace(/\s/g,'');
+}
+
+// Check if transcript matches a voice command — returns command key or null
+function vadDetectCommand(raw){
+  const t = raw.toLowerCase().replace(/[.,!?;:'-]/g,' ').replace(/\s+/g,' ').trim();
+  // Repeat call: "your call again", "call again", "say again", "repeat", "nochmal", "agn"
+  // Only trigger "your call" alone on final result (avoid interim false positive)
+  if(t.includes('call again') || t.includes('say again') || t.includes('agn') ||
+     t.includes('your call') || t.includes('repeat') ||
+     t.includes('nochmal') || t.includes('wie bitte') || t.includes('nochmal bitte')){
+    return 'repeat_call';
+  }
+  // Repeat locator: anything with "locator"
+  if(t.includes('locator')){
+    return 'repeat_locator';
+  }
+  return null;
+}
+
+// Check if transcript contains a partial callsign match (≥2 chars match in sequence)
+function vadIsPartialCall(raw){
+  if(!curQSO) return false;
+  const spoken = natoToCallsign(raw);
+  if(spoken.length < 2) return false;
+  const expected = curQSO.call.toUpperCase();
+  // Exact match = not a partial (will be handled as normal input)
+  if(spoken === expected) return false;
+  // Check if spoken chars appear as a subsequence in the expected call
+  let si = 0, ei = 0;
+  while(si < spoken.length && ei < expected.length){
+    if(spoken[si] === expected[ei]){ si++; }
+    ei++;
+  }
+  // At least 2 chars matched and ≥40% of spoken matched → partial
+  // (lowered from 50% so that e.g. 2-char fragments trigger more reliably)
+  if(si >= 2 && (si / spoken.length) >= 0.4) return true;
+  // Additional check: if spoken.length === 2 and both chars appear anywhere in call
+  // (handles "5 romeo" → "5R" against "OE5RFM")
+  if(spoken.length === 2){
+    return expected.includes(spoken[0]) && expected.includes(spoken[1]);
+  }
+  return false;
+}
+
+function setVadStatus(msg, color){
+  const el = document.getElementById('vad-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--txt3)';
+}
+
+function vadBtnUpdate(){
+  const btn = document.getElementById('vad-btn');
+  if(!btn) return;
+  const statusEl = document.getElementById('vad-status');
+  if(!vadActive){
+    btn.style.borderColor = 'rgba(74,158,255,.3)';
+    btn.style.color       = 'var(--txt3)';
+    btn.style.background  = 'rgba(255,255,255,.03)';
+    btn.textContent       = '🎤 VOICE';
+    if(statusEl) statusEl.style.display = 'none';
+  } else if(vadListening){
+    btn.style.borderColor = 'rgba(255,69,58,.6)';
+    btn.style.color       = '#c25a5c';
+    btn.style.background  = 'rgba(255,69,58,.12)';
+    btn.textContent       = '● REC';
+    if(statusEl) statusEl.style.display = '';
+  } else {
+    btn.style.borderColor = 'rgba(74,158,255,.5)';
+    btn.style.color       = 'var(--acc)';
+    btn.style.background  = 'rgba(74,158,255,.1)';
+    btn.textContent       = '🎤 VOICE';
+    if(statusEl) statusEl.style.display = '';
+  }
+}
+
+function toggleVoiceInput(){
+  initAudio();
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    const el = document.getElementById('vad-status');
+    if(el){ el.style.display=''; el.textContent='⚠ Speech API nicht verfügbar (Chrome/Edge nötig)'; el.style.color='var(--acc3)'; }
+    setTimeout(()=>{ if(el) el.style.display='none'; }, 4000);
+    return;
+  }
+  vadActive = !vadActive;
+  if(vadActive){
+    setVadStatus('🎤 bereit…', 'var(--acc)');
+    vadInitRecognition();  // create persistent instance (one-time permission)
+  } else {
+    vadDestroy();
+    setVadStatus('', '');
+  }
+  vadBtnUpdate();
+}
+
+// Create one persistent continuous SR instance — permission asked only once
+function vadInitRecognition(){
+  if(vadRecognition) return;  // already exists
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return;
+  vadRecognition = new SR();
+  vadRecognition.lang            = 'en-US';
+  vadRecognition.interimResults  = true;
+  vadRecognition.maxAlternatives = 3;
+  vadRecognition.continuous      = true;   // KEY: one permission, stays open
+
+  vadRecognition.onstart = function(){
+    vadListening = true;
+    vadPermission = true;
+    vadBtnUpdate();
+    setVadStatus('● zuhören…', '#c25a5c');
+  };
+
+  vadRecognition.onresult = function(ev){
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const raw     = ev.results[i][0].transcript;
+      const isFinal = ev.results[i].isFinal;
+
+      // Show everything live in status line
+      setVadStatus((isFinal ? '✓ ' : '… ') + raw.toLowerCase(), isFinal ? 'var(--acc2)' : 'var(--txt2)');
+
+      // Debug: log every final result to RX window so we can see what Chrome hears
+      if(isFinal){
+        addLine('🎤 [' + raw + ']', 'sys');
+      }
+
+      // ── Commands: check on every result (interim + final), always ──
+      if(!vadCmdCooldown){
+        const cmd = vadDetectCommand(raw);
+        if(cmd){
+          vadCmdCooldown = true;
+          setTimeout(()=>{ vadCmdCooldown = false; }, 3000);
+          clearTimeout(vadConfirmTimer);
+          addLine('🎤 CMD: ' + cmd, 'sys');
+          vadHandleCommand(cmd);
+          continue;
+        }
+      }
+
+      // ── Non-command: only when trainer expects typed input ──
+      if(!isFinal) continue;
+      if(!sessActive || paused || exPhase === 0) continue;
+      if(vadCmdCooldown) continue;
+
+      clearTimeout(vadConfirmTimer);
+
+      // Best callsign from alternatives
+      let best = '';
+      for(let j = 0; j < ev.results[i].length; j++){
+        const c = natoToCallsign(ev.results[i][j].transcript);
+        if(c.length >= 2){ best = c; break; }
+      }
+      if(!best) best = natoToCallsign(raw);
+
+      // ── Partial callsign → repeat call, silence pile-up ──
+      if(exPhase === 1 && vadIsPartialCall(raw)){
+        setVadStatus('↩ Teilrufzeichen — wiederhole…', 'var(--acc4)');
+        vadCmdCooldown = true;
+        setTimeout(()=>{ vadCmdCooldown = false; }, 3000);
+        vadRepeatCallNoPile();
+        continue;
+      }
+
+      vadFillField(best);
+      if(vadAutoConfirm){
+        vadConfirmTimer = setTimeout(()=>{ vadDoConfirm(); }, VAD_CONFIRM_MS);
+      }
+    }
+  };
+
+  vadRecognition.onerror = function(ev){
+    if(ev.error === 'not-allowed'){
+      vadActive = false;
+      vadListening = false;
+      vadBtnUpdate();
+      setVadStatus('⚠ Mikrofon-Zugriff verweigert', 'var(--acc3)');
+    } else if(ev.error === 'no-speech'){
+      // Ignore — continuous mode handles this silently
+    } else if(ev.error === 'aborted'){
+      // Intentional stop
+    } else {
+      setVadStatus('⚠ ' + ev.error, 'var(--txt3)');
+    }
+  };
+
+  vadRecognition.onend = function(){
+    vadListening = false;
+    vadBtnUpdate();
+    // Auto-restart if still active (continuous mode can drop occasionally)
+    if(vadActive){
+      setTimeout(()=>{
+        if(vadActive && !vadListening){
+          try{ vadRecognition && vadRecognition.start(); }catch(e){}
+        }
+      }, 300);
+    }
+  };
+
+  try{ vadRecognition.start(); }
+  catch(e){ console.warn('VAD start error:', e); }
+}
+
+function vadDestroy(){
+  vadListening = false;
+  clearTimeout(vadConfirmTimer);
+  try{ if(vadRecognition){ vadRecognition.onend=null; vadRecognition.abort(); } }catch(e){}
+  vadRecognition = null;
+  vadBtnUpdate();
+}
+
+// ── Voice command handlers ──
+function vadHandleCommand(cmd){
+  if(cmd === 'repeat_call'){
+    if(!curQSO){ addLine('🎤 kein aktives QSO', 'sys'); return; }
+    setVadStatus('↩ wiederhole Rufzeichen…', 'var(--acc4)');
+    addLine('🎤 wiederhole: ' + curQSO.call, 'sys');
+    vadRepeatCallNoPile();
+  } else if(cmd === 'repeat_locator'){
+    if(!curQSO){ addLine('🎤 kein aktives QSO', 'sys'); return; }
+    const ex  = curQSO.exchange || {};
+    const loc = ex.loc;
+    if(!loc){ addLine('🎤 kein Locator in diesem Contest', 'sys'); return; }
+    setVadStatus('↩ wiederhole Locator…', 'var(--acc4)');
+    addLine('🎤 wiederhole Locator: ' + loc, 'sys');
+    vadRepeatLocator(loc);
+  }
+}
+
+// Repeat callsign ONLY — no pile-up sounds, just the main station
+function vadRepeatCallNoPile(){
+  if(!curQSO) return;
+  stopActivePile();
+  // Pause SR while TTS speaks — Chrome SR+TTS conflict causes silent output
+  try{ if(vadRecognition && vadListening){ vadRecognition.stop(); } }catch(e){}
+  setTimeout(()=>{
+    speak(buildCallPhrase(curQSO.call), curQSO.call, ()=>{
+      // Restart SR after TTS finishes
+      setTimeout(()=>{
+        if(vadActive && !vadListening){
+          try{ vadRecognition && vadRecognition.start(); }catch(e){}
+        }
+      }, 400);
+    });
+  }, 200);
+}
+
+// Repeat locator only — speak the 4-char locator letter by letter
+function vadRepeatLocator(loc){
+  if(!loc) return;
+  stopActivePile();
+  try{ if(vadRecognition && vadListening){ vadRecognition.stop(); } }catch(e){}
+  const words = loc.split('').map(c => NATO[c] || c).join('. ');
+  const text = 'Locator. ' + words + '. Roger.';
+  setTimeout(()=>{
+    speak(text, '', ()=>{
+      setTimeout(()=>{
+        if(vadActive && !vadListening){
+          try{ vadRecognition && vadRecognition.start(); }catch(e){}
+        }
+      }, 400);
+    });
+  }, 200);
+}
+
+function vadFillField(text){
+  if(exPhase === 1){
+    const el = document.getElementById('callinput');
+    if(el){ el.value = text; el.focus(); }
+  } else if(exPhase === 2){
+    const cfg = getExConfig(contest);
+    if(cfg && cfg.fields && cfg.fields.length){
+      const f = document.getElementById(cfg.fields[0].id);
+      if(f){
+        if(cfg.fields[0].type === 'number'){
+          f.value = text.replace(/\D/g,'');
+        } else {
+          f.value = text.toUpperCase().replace(/[^A-Z0-9]/g,'');
+        }
+        f.focus();
+      }
+    }
+  }
+}
+
+function vadDoConfirm(){
+  if(!sessActive || paused) return;
+  clearTimeout(vadConfirmTimer);
+  submitQSO();
+  // No need to restart — continuous SR stays open
+}
+
+// VAD status updater — shows mic state without restarting recognition
+setInterval(function(){
+  if(!vadActive || !vadListening) return;
+  const waiting = sessActive && !paused && exPhase > 0;
+  if(!waiting && !vadCmdCooldown){
+    setVadStatus('🎤 bereit — wartet auf Spielzug…', 'var(--acc)');
+  }
+}, 2000);
+
 function hkeyCall(e){
   if(e.key==='Enter'){e.preventDefault();submitQSO();}
   if(e.key==='Tab' && exPhase===2){
@@ -6907,6 +8243,7 @@ document.addEventListener('keydown',function(e){
     if(e.key==='F1'){e.preventDefault();if(sessActive&&!paused)sendCQ();}
     else if(e.key==='F2'){e.preventDefault();skip();}
     else if(e.key==='F3'){e.preventDefault();replay();}
+    else if(e.key==='F7'){e.preventDefault();requestAgain();}   // v19.2: AGAIN?
     // Enter fallback: if callinput lost focus, re-focus it and submit
     else if(e.key==='Enter'){
       const ci=document.getElementById('callinput');
@@ -6916,9 +8253,20 @@ document.addEventListener('keydown',function(e){
     else if(e.metaKey&&e.key==='2'){e.preventDefault();skip();}
     else if(e.metaKey&&e.key==='3'){e.preventDefault();replay();}
     else if((e.key==='r'||e.key==='R')&&!inp){e.preventDefault();initAudio();replay();}
-    else if(e.key==='?' || (e.key==='/' && e.shiftKey)){e.preventDefault();const m=document.getElementById('manual-ov');if(m)m.style.display=m.style.display==='none'?'block':'none';}
-  }catch(e2){}
-});
+    else if((e.key==='?' || (e.key==='/' && e.shiftKey)) && !inp){e.preventDefault();const m=document.getElementById('manual-ov');if(m)m.style.display=m.style.display==='none'?'block':'none';}
+    // ── Rescue: alphanumeric key typed while callinput should have focus ──
+    // Catches the "first character lost" bug when overlay closes or focus is stolen.
+    else if(sessActive && !paused && !inp && !e.metaKey && !e.ctrlKey && !e.altKey && e.key.length===1 && /^[A-Za-z0-9/]$/.test(e.key)){
+      const ci=document.getElementById('callinput');
+      if(ci && exPhase===1){
+        e.preventDefault();
+        ci.focus();
+        ci.value += e.key.toUpperCase();
+        const len=ci.value.length;
+        try{ci.setSelectionRange(len,len);}catch(ex){}
+      }
+    }
+  }catch(e2){}});
 
 function showManual(){
   renderManual();
@@ -6938,7 +8286,7 @@ window.addEventListener('load',function(){
     // UTC clock - started independently above
     // updClk();
     // setInterval(updClk,1000);
-    setTime(10);setDiff('easy');
+    setTime(10); selectDiffPreset('easy');
     document.getElementById('nb-band').classList.add('on');
     updateNoiseLabel();
     updateRFiltLabel();
@@ -6961,7 +8309,10 @@ window.addEventListener('load',function(){
 
     // Init audio on first user gesture (required by browsers)
     document.addEventListener('click',function(){try{initAudio();}catch(e){}},{once:true});
-    document.addEventListener('keydown',function(){try{initAudio();}catch(e){}},{once:true});
+    document.addEventListener('keydown',function(ev){
+      try{initAudio();}catch(e){}
+      // Do NOT consume the event — re-dispatch so the keystroke still reaches the focused input
+    },{once:true});
   }catch(e){
     console.warn('Init warning:',e);
   }
@@ -6994,10 +8345,10 @@ var MANUAL_CONTENT={
     s3note:'Mac: F-Tasten funktionieren direkt wenn „Standard-Funktionstasten" in Systemeinstellungen → Tastatur aktiviert ist. Sonst Fn+F1 usw.',
     s4h:'🎙 Voice Readback',
     s4pre:'Nur bei <strong style="color:#fff">ONLY CALL</strong> verfügbar. Im linken Panel „Mit Voice" aktivieren. Ablauf:',
-    s4steps:['Call hören → ins Eingabefeld tippen → Enter','PTT-Overlay erscheint → <strong style="color:#ff6666">Leertaste halten</strong>','Call phonetisch sprechen (z.B. „Kilo Lima Five Alpha Bravo Charlie")','Leertaste loslassen → automatische Auswertung'],
-    s4post:'„<strong style="color:#ff9500">Correction</strong>" sprechen → alles löschen, try again. Benötigt <strong style="color:#fff">Chrome</strong> und Mikrofon-Berechtigung.',
-    s5h:'S&amp;P — Search &amp; Pounce',
-    s5:'Im Header den <strong style="color:#fff">RUN</strong>-Button auf <strong style="color:#ff9500">S&amp;P</strong> umschalten. Im linken Panel erscheinen Stationen auf dem Band — anklicken, Call tippen, Exchange eingeben. Realistische Alternative zum normalen CQ-Running.',
+    s4steps:['Call hören → ins Eingabefeld tippen → Enter','PTT-Overlay erscheint → <strong style="color:#a86b6d">Leertaste halten</strong>','Call phonetisch sprechen (z.B. „Kilo Lima Five Alpha Bravo Charlie")','Leertaste loslassen → automatische Auswertung'],
+    s4post:'„<strong style="color:#a8853f">Correction</strong>" sprechen → alles löschen, try again. Benötigt <strong style="color:#fff">Chrome</strong> und Mikrofon-Berechtigung.',
+    s5h:'Medium — Rufende Stationen',
+    s5:'Im linken Panel (sichtbar wenn MEDIUM gewählt) kann die Anzahl der gleichzeitig rufenden Stationen mit dem CALLER-Regler eingestellt werden: 1 = nur eine Station (ruhig), bis 4 = vier Stationen gleichzeitig (chaotisch). Standardwert ist 2.',
     s6h:'Bandöffnungen',
     s6:'Nach einigen Minuten wechselt automatisch die Signalqualität. Die aktuelle Propagationsbedingung wird im VFO-Bereich angezeigt:',
     s6rows:[
@@ -7013,9 +8364,9 @@ var MANUAL_CONTENT={
     s7:'Das <strong style="color:#fff">QSO/h</strong>-Feld zeigt die aktuelle Rate auf Basis der letzten 10 Minuten — wie im echten Contest. Die Grafik rechts daneben zeigt den Verlauf als Kurve in Echtzeit.',
     s8h:'Schwierigkeitsgrade',
     s8:[
-      ['Easy','EU/NA-Calls, kurze Suffixe, sauberes Audio. Ideal zum Einstieg.','#1a6fd4'],
-      ['Medium','Weltweite Calls, RF-Filter aktiv, leichtes QSB. Realistischer Alltagsbetrieb.','#4a9eff'],
-      ['Contest King','Seltene DX-Calls, starkes QRM/QSB, Pile-up, /P und /MM Suffixe. Profi-Level.','#ffd60a']
+      ['Easy','EU/NA-Calls, kurze Suffixe, sauberes Audio. Ideal zum Einstieg.','#2f5c86'],
+      ['Medium','Weltweite Calls, RF-Filter aktiv, leichtes QSB. Realistischer Alltagsbetrieb.','#4a7ba8'],
+      ['Contest King','Seltene DX-Calls, starkes QRM/QSB, Pile-up, /P und /MM Suffixe. Profi-Level.','#c2924f']
     ],
     s9h:'Audio &amp; Atmosphäre',
     s9:[
@@ -7060,10 +8411,10 @@ var MANUAL_CONTENT={
     s3note:'Mac: las teclas de función funcionan directamente si «Usar teclas F1, F2, etc. como teclas de función estándar» está activado en Preferencias del Sistema → Teclado. Si no, usa Fn+F1, etc.',
     s4h:'🎙 Voice Readback',
     s4pre:'Solo disponible en <strong style="color:#fff">ONLY CALL</strong>. Activa «Con Voice» en el panel izquierdo. Proceso:',
-    s4steps:['Escuchar indicativo → escribirlo en el campo → Enter','Aparece el overlay PTT → <strong style="color:#ff6666">mantener barra espaciadora</strong>','Deletrear el indicativo fonéticamente (p.ej. «Kilo Lima Five Alpha Bravo Charlie»)','Soltar la barra espaciadora → evaluación automática'],
-    s4post:'Decir «<strong style="color:#ff9500">Correction</strong>» borra todo para repetir. Requiere <strong style="color:#fff">Chrome</strong> y permiso de micrófono.',
-    s5h:'S&amp;P — Search &amp; Pounce',
-    s5:'Cambia el botón <strong style="color:#fff">RUN</strong> del encabezado a <strong style="color:#ff9500">S&amp;P</strong>. En el panel izquierdo aparecen estaciones en la banda — haz clic, escribe el indicativo e introduce el intercambio. Alternativa realista al CQ Running normal.',
+    s4steps:['Escuchar indicativo → escribirlo en el campo → Enter','Aparece el overlay PTT → <strong style="color:#a86b6d">mantener barra espaciadora</strong>','Deletrear el indicativo fonéticamente (p.ej. «Kilo Lima Five Alpha Bravo Charlie»)','Soltar la barra espaciadora → evaluación automática'],
+    s4post:'Decir «<strong style="color:#a8853f">Correction</strong>» borra todo para repetir. Requiere <strong style="color:#fff">Chrome</strong> y permiso de micrófono.',
+    s5h:'Medium — Estaciones que llaman',
+    s5:'En el panel izquierdo (visible cuando MEDIUM está seleccionado) el control CALLER ajusta cuántas estaciones llaman simultáneamente: 1 = solo una (tranquilo), hasta 4 = cuatro a la vez (caótico). Valor por defecto: 2.',
     s6h:'Aperturas de banda',
     s6:'Cada pocos minutos la calidad de señal cambia automáticamente. La condición de propagación actual se muestra en el área VFO:',
     s6rows:[
@@ -7079,9 +8430,9 @@ var MANUAL_CONTENT={
     s7:'El campo <strong style="color:#fff">QSO/h</strong> muestra la tasa actual basada en los últimos 10 minutos — igual que en un concurso real. El gráfico a la derecha muestra la evolución en tiempo real.',
     s8h:'Niveles de dificultad',
     s8:[
-      ['Easy','Indicativos EU/NA, sufijos cortos, audio limpio. Ideal para empezar.','#1a6fd4'],
-      ['Medium','Indicativos mundiales, filtro RF activo, QSB ligero. Operación diaria realista.','#4a9eff'],
-      ['Contest King','DX raros, QRM/QSB fuerte, pile-up, sufijos /P y /MM. Nivel profesional.','#ffd60a']
+      ['Easy','Indicativos EU/NA, sufijos cortos, audio limpio. Ideal para empezar.','#2f5c86'],
+      ['Medium','Indicativos mundiales, filtro RF activo, QSB ligero. Operación diaria realista.','#4a7ba8'],
+      ['Contest King','DX raros, QRM/QSB fuerte, pile-up, sufijos /P y /MM. Nivel profesional.','#c2924f']
     ],
     s9h:'Audio &amp; Atmósfera',
     s9:[
@@ -7126,10 +8477,10 @@ var MANUAL_CONTENT={
     s3note:'Mac: function keys work directly if "Use F1, F2, etc. keys as standard function keys" is enabled in System Settings → Keyboard. Otherwise use Fn+F1 etc.',
     s4h:'🎙 Voice Readback',
     s4pre:'Available in <strong style="color:#fff">ONLY CALL</strong> only. Enable "With Voice" in the left panel. Workflow:',
-    s4steps:['Hear callsign → type it into the field → Enter','PTT overlay appears → <strong style="color:#ff6666">hold Space</strong>','Spell the callsign phonetically (e.g. "Kilo Lima Five Alpha Bravo Charlie")','Release Space → automatic scoring'],
-    s4post:'Say "<strong style="color:#ff9500">Correction</strong>" to erase and try again. Requires <strong style="color:#fff">Chrome</strong> and microphone permission.',
-    s5h:'S&amp;P — Search &amp; Pounce',
-    s5:'Switch the <strong style="color:#fff">RUN</strong> button in the header to <strong style="color:#ff9500">S&amp;P</strong>. The left panel shows stations on the band — click one, type the callsign and enter the exchange. A realistic alternative to CQ Running.',
+    s4steps:['Hear callsign → type it into the field → Enter','PTT overlay appears → <strong style="color:#a86b6d">hold Space</strong>','Spell the callsign phonetically (e.g. "Kilo Lima Five Alpha Bravo Charlie")','Release Space → automatic scoring'],
+    s4post:'Say "<strong style="color:#a8853f">Correction</strong>" to erase and try again. Requires <strong style="color:#fff">Chrome</strong> and microphone permission.',
+    s5h:'Medium — Calling Stations',
+    s5:'In the left panel (visible when MEDIUM is selected) the CALLER slider sets how many stations call simultaneously: 1 = one station (quiet), up to 4 = four at once (chaotic). Default is 2.',
     s6h:'Band Openings',
     s6:'Every few minutes the signal quality changes automatically. The current propagation condition is shown in the VFO area:',
     s6rows:[
@@ -7145,9 +8496,9 @@ var MANUAL_CONTENT={
     s7:'The <strong style="color:#fff">QSO/h</strong> field shows the current rate based on the last 10 minutes — just like in a real contest. The chart to the right displays the trend as a real-time curve.',
     s8h:'Difficulty Levels',
     s8:[
-      ['Easy','EU/NA callsigns, short suffixes, clean audio. Ideal for beginners.','#1a6fd4'],
-      ['Medium','Worldwide callsigns, RF filter active, light QSB. Realistic everyday operation.','#4a9eff'],
-      ['Contest King','Rare DX callsigns, heavy QRM/QSB, pile-up, /P and /MM suffixes. Pro level.','#ffd60a']
+      ['Easy','EU/NA callsigns, short suffixes, clean audio. Ideal for beginners.','#2f5c86'],
+      ['Medium','Worldwide callsigns, RF filter active, light QSB. Realistic everyday operation.','#4a7ba8'],
+      ['Contest King','Rare DX callsigns, heavy QRM/QSB, pile-up, /P and /MM suffixes. Pro level.','#c2924f']
     ],
     s9h:'Audio &amp; Atmosphere',
     s9:[
@@ -7178,7 +8529,7 @@ function switchManLang(l){
   manLang=l;
   ['de','es','en'].forEach(function(x){
     var b=document.getElementById('mbl-'+x);
-    if(b){b.style.background=x===l?'rgba(74,158,255,.25)':'rgba(255,255,255,.05)';b.style.color=x===l?'#4a9eff':'rgba(255,255,255,.5)';
+    if(b){b.style.background=x===l?'rgba(74,158,255,.25)':'rgba(255,255,255,.05)';b.style.color=x===l?'#4a7ba8':'rgba(255,255,255,.5)';
       b.style.borderColor=x===l?'rgba(74,158,255,.35)':'rgba(255,255,255,.12)';}
   });
   var t=document.getElementById('manual-title');
@@ -7190,9 +8541,9 @@ function renderManual(){
   var c=MANUAL_CONTENT[manLang];
   var P='font-size:11px;line-height:1.7;color:rgba(255,255,255,.75);font-family:sans-serif;margin:0';
   var PB=P+' 0 8px 0';
-  var TDk='padding:3px 8px 3px 0;color:#4a9eff;white-space:nowrap;font-weight:600;vertical-align:top';
+  var TDk='padding:3px 8px 3px 0;color:#4a7ba8;white-space:nowrap;font-weight:600;vertical-align:top';
   var TDv='padding:3px 0;color:rgba(255,255,255,.7)';
-  function sec(h,body){return '<div style="margin-bottom:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#4a9eff;border-bottom:1px solid rgba(74,158,255,.2);padding-bottom:5px;margin-bottom:9px;font-family:sans-serif;font-weight:700">'+h+'</div>'+body+'</div>';}
+  function sec(h,body){return '<div style="margin-bottom:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#4a7ba8;border-bottom:1px solid rgba(74,158,255,.2);padding-bottom:5px;margin-bottom:9px;font-family:sans-serif;font-weight:700">'+h+'</div>'+body+'</div>';}
   function tbl(rows){var r='<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:11px">';rows.forEach(function(row){r+='<tr><td style="'+TDk+'">'+row[0]+'</td><td style="'+TDv+'">'+row[1]+'</td></tr>';});return r+'</table>';}
   var h='';
   // s1
@@ -7229,7 +8580,7 @@ function renderManual(){
   // s11 score
   h+=sec(c.s11h,'<p style="'+P+'">'+c.s11+'</p>');
   // footer
-  h+='<div style="margin-top:24px;text-align:center;font-size:9px;color:rgba(255,255,255,.25);font-family:sans-serif;letter-spacing:1px">HF Contest Trainer · v6.1 · '+c.footer+'</div>';
+  h+='<div style="margin-top:24px;text-align:center;font-size:9px;color:rgba(255,255,255,.25);font-family:sans-serif;letter-spacing:1px">HF Contest Trainer · v6.53 · '+c.footer+'</div>';
   var el=document.getElementById('manual-body');
   if(el) el.innerHTML=h;
 }
@@ -7244,15 +8595,635 @@ function renderManual(){
     <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:rgba(255,255,255,.35);text-transform:uppercase;font-family:sans-serif;margin-bottom:6px">HF Contest Trainer</div>
     <!-- Language selector -->
     <div style="display:flex;gap:6px;margin-bottom:18px;align-items:center">
-      <button id="mbl-de" onclick="switchManLang('de')" style="background:rgba(74,158,255,.25);border:1px solid rgba(74,158,255,.35);color:#4a9eff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">DE</button>
+      <button id="mbl-de" onclick="switchManLang('de')" style="background:rgba(74,158,255,.25);border:1px solid rgba(74,158,255,.35);color:#4a7ba8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">DE</button>
       <button id="mbl-es" onclick="switchManLang('es')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">ES</button>
       <button id="mbl-en" onclick="switchManLang('en')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">EN</button>
-      <div id="manual-title" style="font-size:20px;font-weight:300;color:#4a9eff;letter-spacing:1px;font-family:sans-serif;margin-left:8px">Handbuch</div>
+      <div id="manual-title" style="font-size:20px;font-weight:300;color:#4a7ba8;letter-spacing:1px;font-family:sans-serif;margin-left:8px">Handbuch</div>
     </div>
     <!-- Dynamic content -->
     <div id="manual-body"></div>
   </div>
 </div>
+
+<script>
+/* ══════════════════════════════════════════════
+   LAYOUT C — SPLIT TERMINAL  JS
+   ══════════════════════════════════════════════ */
+
+let currentLayout = 'c';  // 'default' | 'c'
+let lcActiveTab   = 'trainer';
+
+// Apply Layout C on load
+(function initLayoutC(){
+  document.body.classList.add('layout-c');
+  // Sync callsign badge in tab bar
+  const syncCall = () => {
+    const c = document.getElementById('bbar-call');
+    const t = document.getElementById('lc-tab-call');
+    if(c && t) t.textContent = c.textContent || '—';
+  };
+  setInterval(syncCall, 1000);
+})();
+
+// Tab switching
+function lcSwitchTab(tab){
+  lcActiveTab = tab;
+  ['trainer','analytics','log'].forEach(t => {
+    const el = document.getElementById('lct-'+t);
+    if(el) el.classList.toggle('lc-active', t === tab);
+  });
+  // Trainer tab = show normal UI; analytics/log = trigger existing overlays
+  if(tab === 'analytics'){ showAnalytics(); lcSwitchTab('trainer'); }
+  else if(tab === 'log'){ showLeaderboard(); lcSwitchTab('trainer'); }
+}
+
+// ── Level Dot Bar updater ──
+function lcUpdateDotBar(){
+  const lvl = adaptCurrentLevel;          // 0–10
+  const diff = adaptLevelToDiff(lvl);
+
+  for(let i = 1; i <= 10; i++){
+    const dot = document.getElementById('lcdot-'+i);
+    if(!dot) continue;
+    dot.className = 'lc-dot';
+    if(i <= lvl){
+      if(lvl <= 3)       dot.classList.add('d-easy');
+      else if(lvl <= 7)  dot.classList.add('d-adv');
+      else               dot.classList.add('d-ck');
+    }
+  }
+
+  // Center info text
+  const info = document.getElementById('lc-dotbar-info');
+  if(info){
+    const names = ['','EASY','EASY','EASY','ADVANCED','ADVANCED','ADVANCED','ADVANCED','CONTEST KING','CONTEST KING','CONTEST KING'];
+    const col   = lvl<=3?'var(--lc-easy)':lvl<=7?'var(--lc-adv)':'var(--lc-ck)';
+    info.textContent = 'LVL '+lvl+' · '+names[lvl];
+    info.style.color = col;
+  }
+
+  // Right stats mirror from scoreboard
+  const qsoEl  = document.getElementById('s-qso');
+  const rateEl = document.getElementById('s-rate');
+  const accEl  = document.getElementById('s-acc');
+  if(qsoEl)  { const t=document.getElementById('lc-stat-qso');  if(t) t.textContent=qsoEl.textContent; }
+  if(rateEl) { const t=document.getElementById('lc-stat-rate'); if(t) t.textContent=rateEl.textContent; }
+  if(accEl)  { const t=document.getElementById('lc-stat-acc');  if(t) t.textContent=accEl.textContent; }
+
+  // Auto-adapt LED + countdown mirror
+  const led = document.getElementById('lc-aa-led');
+  const cd  = document.getElementById('lc-aa-cd-bar');
+  if(led) led.classList.toggle('on', autoAdaptOn);
+  if(cd && autoAdaptOn) cd.textContent = autoAdaptCountdown+'s';
+  else if(cd) cd.textContent = '';
+}
+
+// Pulse the just-changed dot
+function lcPulseDot(lvl){
+  const dot = document.getElementById('lcdot-'+Math.max(1,Math.min(10,lvl)));
+  if(dot){ dot.classList.add('d-pulse'); setTimeout(()=>dot.classList.remove('d-pulse'),700); }
+}
+
+// Hook into adaptApplyLevel — patch to also call lcUpdateDotBar
+const _origAdaptApply = adaptApplyLevel;
+adaptApplyLevel = function(lvl, reason){
+  _origAdaptApply(lvl, reason);
+  lcPulseDot(Math.max(0,Math.min(10,lvl)));
+  lcUpdateDotBar();
+};
+
+// Keep dot bar in sync every second
+setInterval(lcUpdateDotBar, 1000);
+</script>
+
+<style>
+/* ══════════════════════════════════════════════
+   LAYOUT D — COMMAND CENTER (3D Globe + Rig Panel)
+   ══════════════════════════════════════════════ */
+.cc-deck{display:none;flex-shrink:0;height:clamp(300px,40vh,420px);background:#05060b;border-bottom:1px solid #1c2333;position:relative;overflow:hidden}
+body.layout-d .cc-deck{display:flex}
+.cc-globe{flex:1;position:relative;min-width:0;background:radial-gradient(ellipse at 50% 120%,#0a1226 0%,#04050a 70%)}
+.cc-globe canvas{display:block}
+.cc-globe-ov{position:absolute;top:8px;left:10px;z-index:5;font-family:var(--fmono);font-size:9px;letter-spacing:1.5px;color:rgba(120,170,255,.55);pointer-events:none;line-height:1.9}
+.cc-globe-ov b{color:rgba(160,200,255,.9);font-weight:600}
+.cc-globe-utc{position:absolute;bottom:6px;left:10px;z-index:5;font-family:var(--fmono);font-size:9px;letter-spacing:1px;color:rgba(120,170,255,.4);pointer-events:none}
+.cc-globe-hint{position:absolute;bottom:6px;right:10px;z-index:5;font-family:var(--fmono);font-size:8px;letter-spacing:1px;color:rgba(120,170,255,.28);pointer-events:none}
+.cc-arc-toast{position:absolute;top:8px;right:10px;z-index:6;font-family:var(--fmono);font-size:10px;letter-spacing:1px;color:#c2924f;text-shadow:0 0 12px rgba(255,214,10,.6);opacity:0;transition:opacity .3s;pointer-events:none}
+/* ── Rig panel: brushed metal ── */
+.cc-rig{width:318px;flex-shrink:0;position:relative;padding:10px 14px 8px;display:flex;flex-direction:column;gap:7px;border-left:2px solid #000;
+  background:linear-gradient(180deg,#3a3f4a 0%,#2b303a 4%,#232833 30%,#1d222c 70%,#171b24 96%,#0d1018 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.6)}
+.cc-rig::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px)}
+.cc-screw{position:absolute;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6a7180,#2a2e38 70%);box-shadow:inset 0 0 2px #000,0 1px 1px rgba(255,255,255,.1);z-index:2}
+.cc-screw::after{content:'';position:absolute;left:1px;right:1px;top:3.5px;height:1.4px;background:#0c0e14;transform:rotate(38deg)}
+.cc-screw.tl{top:5px;left:6px}.cc-screw.tr{top:5px;right:6px}.cc-screw.bl{bottom:5px;left:6px}.cc-screw.br{bottom:5px;right:6px}
+.cc-brand{display:flex;align-items:baseline;justify-content:space-between;font-family:var(--fui);letter-spacing:2.5px;font-size:10px;font-weight:700;color:#9aa4b5;text-shadow:0 1px 1px #000;padding:0 4px}
+.cc-brand span{font-size:8px;font-weight:400;letter-spacing:1.5px;color:#5c6575}
+/* LCD */
+.cc-lcd{background:linear-gradient(180deg,#0b2415,#071a0f 60%,#051208);border:1px solid #000;border-radius:5px;padding:6px 10px 7px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.85),inset 0 0 30px rgba(60,255,140,.05),0 1px 0 rgba(255,255,255,.08);position:relative}
+.cc-lcd-top{display:flex;justify-content:space-between;font-family:var(--fmono);font-size:9px;letter-spacing:1px;color:#3fa065;margin-bottom:1px}
+.cc-freq{font-family:var(--fmono);font-size:31px;font-weight:400;letter-spacing:2px;color:#7fae91;text-shadow:0 0 10px rgba(93,255,138,.55),0 0 26px rgba(93,255,138,.2);text-align:center;font-variant-numeric:tabular-nums;line-height:1.12}
+.cc-freq small{font-size:15px;color:#6fa384;letter-spacing:1px}
+.cc-rit{text-align:center;font-family:var(--fmono);font-size:9px;letter-spacing:1.5px;color:#2f8a52;min-height:11px}
+.cc-rit b{color:#c2924f;font-weight:400;text-shadow:0 0 8px rgba(255,214,10,.4)}
+.cc-lcd-row{display:flex;justify-content:space-between;font-family:var(--fmono);font-size:9.5px;letter-spacing:1px;color:#3fa065;margin-top:3px}
+.cc-lcd-row b{color:#7fae91;font-weight:400;text-shadow:0 0 7px rgba(93,255,138,.4)}
+/* S-Meter */
+.cc-sm-wrap{background:linear-gradient(180deg,#241f14,#1a1710);border:1px solid #000;border-radius:5px;padding:2px;box-shadow:inset 0 2px 6px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.07)}
+.cc-sm-wrap canvas{display:block;width:100%;border-radius:3px}
+/* Controls */
+.cc-ctl{display:flex;gap:12px;align-items:stretch;flex:1;min-height:0}
+.cc-knob-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;justify-content:center}
+.cc-knob{width:96px;height:96px;border-radius:50%;position:relative;cursor:grab;touch-action:none;
+  background:radial-gradient(circle at 34% 28%,#4d5462 0%,#454b58 18%,#353b47 42%,#232833 75%,#141821 100%);
+  box-shadow:0 4px 10px rgba(0,0,0,.7),inset 0 1px 2px rgba(255,255,255,.22),inset 0 -3px 6px rgba(0,0,0,.55),0 0 0 3px #10131b,0 0 0 4px rgba(255,255,255,.06)}
+.cc-knob:active{cursor:grabbing}
+.cc-knob::before{content:'';position:absolute;inset:9px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,255,255,.05) 0 4deg,transparent 4deg 9deg),radial-gradient(circle at 40% 32%,#3a4150,#20242e 70%);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.6)}
+.cc-knob-dot{position:absolute;left:50%;top:13px;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;
+  background:radial-gradient(circle at 38% 30%,#8b93a5,#3c424f 75%);box-shadow:inset 0 1px 2px rgba(0,0,0,.7),0 0 3px rgba(0,0,0,.6)}
+.cc-knob-lbl,.cc-ksm-lbl{font-family:var(--fui);font-size:8px;letter-spacing:2px;color:#7c8698;text-shadow:0 1px 1px #000}
+.cc-right{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;min-width:0}
+.cc-lamps{display:flex;gap:10px;justify-content:center}
+.cc-lamp{display:flex;align-items:center;gap:4px;font-family:var(--fui);font-size:8px;letter-spacing:1.5px;color:#6c7688}
+.cc-lamp i{width:8px;height:8px;border-radius:50%;background:#232833;box-shadow:inset 0 1px 2px #000;transition:all .15s;font-style:normal}
+.cc-lamp.on-pwr i{background:#6fa384;box-shadow:0 0 8px rgba(57,211,83,.8),inset 0 0 2px rgba(255,255,255,.5)}
+.cc-lamp.on-rx i{background:#4a7ba8;box-shadow:0 0 8px rgba(74,158,255,.8),inset 0 0 2px rgba(255,255,255,.5)}
+.cc-lamp.on-tx i{background:#c25a5c;box-shadow:0 0 8px rgba(255,69,58,.8),inset 0 0 2px rgba(255,255,255,.5)}
+.cc-ksm-row{display:flex;gap:12px;justify-content:center;align-items:center}
+.cc-ksm{width:44px;height:44px;border-radius:50%;position:relative;cursor:grab;touch-action:none;
+  background:radial-gradient(circle at 34% 28%,#454b58,#353b47 42%,#232833 78%,#141821 100%);
+  box-shadow:0 3px 7px rgba(0,0,0,.65),inset 0 1px 1px rgba(255,255,255,.2),inset 0 -2px 4px rgba(0,0,0,.5),0 0 0 2px #10131b}
+.cc-ksm i{position:absolute;left:50%;top:5px;width:4px;height:9px;margin-left:-2px;border-radius:2px;background:#aeb6c6;box-shadow:0 0 2px #000}
+.cc-btns{display:flex;gap:5px;justify-content:center}
+.cc-btn{flex:1;max-width:74px;font-family:var(--fui);font-size:9px;font-weight:700;letter-spacing:1.5px;color:#c3cad8;text-shadow:0 1px 1px #000;
+  background:linear-gradient(180deg,#3c424f,#262b36 45%,#1b1f29);border:1px solid #000;border-radius:5px;padding:7px 0;cursor:pointer;
+  box-shadow:0 2px 4px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.16)}
+.cc-btn:hover{color:#fff}
+.cc-btn:active{transform:translateY(1px);box-shadow:0 1px 2px rgba(0,0,0,.5),inset 0 2px 5px rgba(0,0,0,.5);background:linear-gradient(180deg,#20242e,#181c25)}
+.cc-btn.cq{color:#c2924f}
+/* header toggle */
+#cc-layout-btn.on{background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.6);color:#4a7ba8;box-shadow:0 0 10px rgba(74,158,255,.25)}
+body.layout-d .wf-wrap{height:74px}
+@media(max-width:1150px){.cc-rig{width:272px}.cc-freq{font-size:26px}.cc-knob{width:80px;height:80px}}
+</style>
+<script>
+/* ══════════════════════════════════════════════
+   LAYOUT D — COMMAND CENTER  JS
+   3D-Globus (Three.js) + Transceiver-Frontplatte
+   ══════════════════════════════════════════════ */
+(function(){
+'use strict';
+var CC = { on:false, three:null, scene:null, cam:null, renderer:null, earth:null, group:null,
+  arcs:[], markers:{}, homeVec:null, dragging:false, lastDrag:0, theta:0.6, phi:1.15, dist:2.65,
+  rit:0, ritV:0, needle:0, needleV:0, smTarget:0, af:0.75, prevQsoLen:0, prevMults:0,
+  raf:null, texOk:false, curPulse:null, failMsg:false };
+
+/* ── CQ-Zone → ungefähre Zentrums-Koordinaten [lat, lon] ── */
+var ZONE_LL={1:[61,-149],2:[58,-100],3:[45,-120],4:[39,-95],5:[40,-77],6:[23,-102],7:[12,-85],8:[19,-72],9:[7,-70],10:[-10,-75],11:[-12,-52],12:[-33,-71],13:[-36,-63],14:[50,5],15:[47,15],16:[55,40],17:[58,70],18:[55,95],19:[55,130],20:[38,25],21:[30,45],22:[20,78],23:[42,95],24:[30,114],25:[36,138],26:[15,100],27:[12,122],28:[-5,120],29:[-25,120],30:[-30,145],31:[21,-157],32:[-20,-175],33:[30,-3],34:[25,25],35:[10,-5],36:[0,20],37:[5,40],38:[-28,25],39:[-20,47],40:[68,-30]};
+
+function locToLL(loc){
+  try{
+    loc=(loc||'JN67').toUpperCase();
+    var lon=(loc.charCodeAt(0)-65)*20-180+(parseInt(loc[2],10)||0)*2+1;
+    var lat=(loc.charCodeAt(1)-65)*10-90+(parseInt(loc[3],10)||0)+0.5;
+    return [lat,lon];
+  }catch(e){ return [47.5,12]; }
+}
+function llToVec(lat,lon,r){
+  var phi=(90-lat)*Math.PI/180, th=(lon+180)*Math.PI/180;
+  return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(th), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(th));
+}
+function sunDirNow(){
+  var d=new Date(), doy=(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-Date.UTC(d.getUTCFullYear(),0,0))/864e5;
+  var decl=23.44*Math.sin(2*Math.PI*(284+doy)/365);
+  var h=d.getUTCHours()+d.getUTCMinutes()/60+d.getUTCSeconds()/3600;
+  var lon=-15*(h-12);
+  return llToVec(decl,lon,1).normalize();
+}
+
+/* ── Header-Button ── */
+function addHeaderBtn(){
+  var hr=document.querySelector('.hdr-right'); if(!hr) return;
+  var b=document.createElement('button');
+  b.className='sp-toggle'; b.id='cc-layout-btn'; b.textContent='🌐 3D';
+  b.title='Command Center — 3D-Globus & Transceiver-Frontplatte';
+  b.style.cssText='border-color:rgba(74,158,255,.3);color:var(--txt3)';
+  b.onclick=function(){ setLayoutD(!CC.on); };
+  hr.insertBefore(b, hr.firstElementChild);
+}
+
+/* ── Deck-DOM ── */
+function buildDeck(){
+  if(document.getElementById('cc-deck')) return;
+  var cp=document.querySelector('.cp'); if(!cp) return;
+  var d=document.createElement('div');
+  d.className='cc-deck'; d.id='cc-deck';
+  d.innerHTML=
+   '<div class="cc-globe" id="cc-globe">'+
+     '<div class="cc-globe-ov">DX COMMAND CENTER<br>QSO <b id="ccg-qso">0</b> · MULT <b id="ccg-mult">0</b> · <b id="ccg-score">0</b> PTS</div>'+
+     '<div class="cc-arc-toast" id="cc-arc-toast"></div>'+
+     '<div class="cc-globe-utc" id="cc-globe-utc"></div>'+
+     '<div class="cc-globe-hint">DRAG = DREHEN · SCROLL = ZOOM</div>'+
+   '</div>'+
+   '<div class="cc-rig">'+
+     '<div class="cc-screw tl"></div><div class="cc-screw tr"></div><div class="cc-screw bl"></div><div class="cc-screw br"></div>'+
+     '<div class="cc-brand">HF COMMANDER <span>MK·V · '+ (new Date().getFullYear()) +'</span></div>'+
+     '<div class="cc-lcd">'+
+       '<div class="cc-lcd-top"><span id="cc-mode">SSB · USB</span><span id="cc-utc2">--:--:--z</span></div>'+
+       '<div class="cc-freq" id="cc-freq">14.225.<small>00</small></div>'+
+       '<div class="cc-rit" id="cc-rit">RIT ±0 Hz</div>'+
+       '<div class="cc-lcd-row"><span>QSO <b id="cc-qso">0</b></span><span>MUL <b id="cc-mult">0</b></span><span>SCR <b id="cc-score">0</b></span></div>'+
+     '</div>'+
+     '<div class="cc-sm-wrap"><canvas id="cc-smeter" width="560" height="150"></canvas></div>'+
+     '<div class="cc-ctl">'+
+       '<div class="cc-knob-wrap"><div class="cc-knob" id="cc-knob"><div class="cc-knob-dot" id="cc-knob-dot"></div></div><div class="cc-knob-lbl">VFO · RIT</div></div>'+
+       '<div class="cc-right">'+
+         '<div class="cc-lamps">'+
+           '<div class="cc-lamp" id="cc-lamp-pwr"><i></i>PWR</div>'+
+           '<div class="cc-lamp" id="cc-lamp-rx"><i></i>RX</div>'+
+           '<div class="cc-lamp" id="cc-lamp-tx"><i></i>TX</div>'+
+         '</div>'+
+         '<div class="cc-ksm-row"><div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="cc-ksm" id="cc-af"><i id="cc-af-i"></i></div><div class="cc-ksm-lbl">AF</div></div></div>'+
+         '<div class="cc-btns">'+
+           '<button class="cc-btn cq" onclick="try{if(typeof sessActive!==\'undefined\'&&sessActive&&!paused)sendCQ();}catch(e){}">CQ</button>'+
+           '<button class="cc-btn" onclick="try{skip();}catch(e){}">SKIP</button>'+
+           '<button class="cc-btn" onclick="try{replay();}catch(e){}">REP</button>'+
+         '</div>'+
+       '</div>'+
+     '</div>'+
+   '</div>';
+  cp.insertBefore(d, cp.firstElementChild);
+  initKnobs(); initSMeter();
+}
+
+/* ── Toggle ── */
+window.setLayoutD=function(on){
+  CC.on=on;
+  buildDeck();
+  document.body.classList.toggle('layout-d', on);
+  var b=document.getElementById('cc-layout-btn'); if(b) b.classList.toggle('on', on);
+  try{ localStorage.setItem('hfct_layout_d', on?'1':'0'); }catch(e){}
+  if(on){ loadThree(); startLoop(); }
+  else if(CC.raf){ cancelAnimationFrame(CC.raf); CC.raf=null; }
+};
+
+/* ── Three.js Lazy-Load ── */
+function loadThree(){
+  if(window.THREE){ initGlobe(); return; }
+  if(CC._loading) return; CC._loading=true;
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload=function(){ initGlobe(); };
+  s.onerror=function(){
+    var g=document.getElementById('cc-globe');
+    if(g&&!CC.failMsg){CC.failMsg=true;g.insertAdjacentHTML('beforeend','<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(120,170,255,.5);font-family:var(--fmono);font-size:11px;letter-spacing:1px">3D-GLOBUS: KEINE INTERNETVERBINDUNG (Three.js CDN)</div>');}
+  };
+  document.head.appendChild(s);
+}
+
+/* ── Globus ── */
+function initGlobe(){
+  if(CC.renderer) return;
+  var box=document.getElementById('cc-globe'); if(!box) return;
+  var W=box.clientWidth||600, H=box.clientHeight||340;
+  CC.scene=new THREE.Scene();
+  CC.cam=new THREE.PerspectiveCamera(38, W/H, .1, 100);
+  CC.renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
+  CC.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  CC.renderer.setSize(W,H);
+  CC.renderer.domElement.style.cssText='position:absolute;inset:0';
+  box.appendChild(CC.renderer.domElement);
+
+  /* Sterne */
+  var sg=new THREE.BufferGeometry(), sp=[];
+  for(var i=0;i<900;i++){ var v=new THREE.Vector3().randomDirection?new THREE.Vector3().randomDirection():null;
+    var u=Math.random()*2-1, t=Math.random()*Math.PI*2, r=28;
+    sp.push(r*Math.sqrt(1-u*u)*Math.cos(t), r*u, r*Math.sqrt(1-u*u)*Math.sin(t)); }
+  sg.setAttribute('position', new THREE.Float32BufferAttribute(sp,3));
+  CC.scene.add(new THREE.Points(sg, new THREE.PointsMaterial({color:0x8899bb,size:.045,transparent:true,opacity:.7})));
+
+  CC.group=new THREE.Group(); CC.scene.add(CC.group);
+
+  /* Erd-Shader: Tag/Nacht-Mix = Greyline */
+  var loader=new THREE.TextureLoader(); loader.setCrossOrigin('anonymous');
+  var uni={ dayTex:{value:null}, nightTex:{value:null}, sunDir:{value:sunDirNow()}, texOk:{value:0} };
+  var mat=new THREE.ShaderMaterial({
+    uniforms:uni,
+    vertexShader:'varying vec2 vUv; varying vec3 vN; varying vec3 vE;'+
+      'void main(){ vUv=uv; vN=normalize(mat3(modelMatrix)*normal);'+
+      'vec4 wp=modelMatrix*vec4(position,1.0); vE=normalize(cameraPosition-wp.xyz);'+
+      'gl_Position=projectionMatrix*viewMatrix*wp; }',
+    fragmentShader:'uniform sampler2D dayTex; uniform sampler2D nightTex; uniform vec3 sunDir; uniform float texOk;'+
+      'varying vec2 vUv; varying vec3 vN; varying vec3 vE;'+
+      'void main(){ float s=dot(normalize(vN),normalize(sunDir));'+
+      'float m=smoothstep(-0.12,0.28,s);'+
+      'vec3 day=texOk>0.5? texture2D(dayTex,vUv).rgb : vec3(0.05,0.14,0.30);'+
+      'vec3 nite=texOk>0.5? texture2D(nightTex,vUv).rgb*1.25 : vec3(0.01,0.02,0.06);'+
+      'vec3 col=mix(nite,day,m);'+
+      'float fres=pow(1.0-max(dot(normalize(vN),normalize(vE)),0.0),2.6);'+
+      'col+=vec3(0.18,0.38,0.75)*fres*0.55;'+
+      'float grey=smoothstep(0.10,0.0,abs(s))*0.10; col+=vec3(grey*0.9,grey*0.55,grey*0.2);'+
+      'gl_FragColor=vec4(col,1.0); }'
+  });
+  CC.earth=new THREE.Mesh(new THREE.SphereGeometry(1,72,72), mat);
+  CC.group.add(CC.earth);
+
+  var loaded=0;
+  function done(){ loaded++; if(loaded===2){ uni.texOk.value=1; CC.texOk=true; } }
+  loader.load('https://unpkg.com/three-globe@2.31.0/example/img/earth-blue-marble.jpg', function(t){ uni.dayTex.value=t; done(); }, undefined, function(){ addGrid(); });
+  loader.load('https://unpkg.com/three-globe@2.31.0/example/img/earth-night.jpg', function(t){ uni.nightTex.value=t; done(); }, undefined, function(){});
+
+  function addGrid(){ /* Fallback-Gitter falls Textur nicht lädt */
+    var gmat=new THREE.LineBasicMaterial({color:0x2a4a7a,transparent:true,opacity:.5});
+    for(var la=-60;la<=60;la+=30){ var pts=[]; for(var lo=-180;lo<=180;lo+=6) pts.push(llToVec(la,lo,1.002));
+      CC.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gmat)); }
+    for(var lo2=-180;lo2<180;lo2+=30){ var pts2=[]; for(var la2=-90;la2<=90;la2+=6) pts2.push(llToVec(la2,lo2,1.002));
+      CC.group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), gmat)); }
+  }
+
+  /* Atmosphäre */
+  var atm=new THREE.Mesh(new THREE.SphereGeometry(1.09,64,64), new THREE.ShaderMaterial({
+    side:THREE.BackSide, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false,
+    vertexShader:'varying vec3 vN; varying vec3 vE; void main(){ vN=normalize(mat3(modelMatrix)*normal);'+
+      'vec4 wp=modelMatrix*vec4(position,1.0); vE=normalize(cameraPosition-wp.xyz);'+
+      'gl_Position=projectionMatrix*viewMatrix*wp; }',
+    fragmentShader:'varying vec3 vN; varying vec3 vE;'+
+      'void main(){ float f=pow(0.62-dot(normalize(vN),normalize(vE)),3.0);'+
+      'gl_FragColor=vec4(0.25,0.5,1.0,1.0)*max(f,0.0)*1.4; }'
+  }));
+  CC.group.add(atm);
+
+  /* Home-Marker */
+  updateHome();
+
+  /* Interaktion */
+  var el=CC.renderer.domElement, px=0, py=0;
+  el.style.cursor='grab';
+  el.addEventListener('pointerdown', function(e){ CC.dragging=true; px=e.clientX; py=e.clientY; el.setPointerCapture(e.pointerId); el.style.cursor='grabbing'; });
+  el.addEventListener('pointermove', function(e){ if(!CC.dragging) return;
+    CC.theta-=(e.clientX-px)*.005; CC.phi-=(e.clientY-py)*.005;
+    CC.phi=Math.max(.25,Math.min(Math.PI-.25,CC.phi)); px=e.clientX; py=e.clientY; CC.lastDrag=Date.now(); });
+  el.addEventListener('pointerup', function(e){ CC.dragging=false; el.style.cursor='grab'; try{el.releasePointerCapture(e.pointerId);}catch(x){} });
+  el.addEventListener('wheel', function(e){ e.preventDefault(); CC.dist=Math.max(1.7,Math.min(5,CC.dist+e.deltaY*.0018)); CC.lastDrag=Date.now(); }, {passive:false});
+
+  if(window.ResizeObserver){ new ResizeObserver(function(){
+    var w=box.clientWidth, h=box.clientHeight; if(!w||!h||!CC.renderer) return;
+    CC.renderer.setSize(w,h); CC.cam.aspect=w/h; CC.cam.updateProjectionMatrix();
+  }).observe(box); }
+
+  /* Blickwinkel initial auf Heimat-QTH */
+  var hll=locToLL(typeof myLocator!=='undefined'?myLocator:'JN67');
+  CC.phi=(90-hll[0])*Math.PI/180; CC.theta=-hll[1]*Math.PI/180;
+}
+
+function glowSprite(color){
+  var c=document.createElement('canvas'); c.width=c.height=64;
+  var g=c.getContext('2d'), gr=g.createRadialGradient(32,32,2,32,32,30);
+  gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.25,color); gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr; g.fillRect(0,0,64,64);
+  var t=new THREE.CanvasTexture(c);
+  return new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+}
+
+function updateHome(){
+  if(!CC.group) return;
+  if(CC.homeMk){ CC.group.remove(CC.homeMk); }
+  var ll=locToLL(typeof myLocator!=='undefined'?myLocator:'JN67');
+  CC.homeVec=llToVec(ll[0],ll[1],1.012);
+  var s=glowSprite('rgba(255,214,10,.9)'); s.scale.set(.12,.12,1); s.position.copy(CC.homeVec);
+  CC.homeMk=s; CC.group.add(s);
+}
+
+/* ── QSO-Bogen ── */
+function addArc(zone,isMult){
+  if(!CC.group||!window.THREE) return;
+  var ll=ZONE_LL[zone]; if(!ll) return;
+  updateHome();
+  var p0=CC.homeVec.clone(), p1=llToVec(ll[0]+(Math.random()*8-4), ll[1]+(Math.random()*10-5), 1.012);
+  var dist=p0.distanceTo(p1);
+  var mid=p0.clone().add(p1).multiplyScalar(.5).normalize().multiplyScalar(1+dist*.38);
+  var curve=new THREE.QuadraticBezierCurve3(p0,mid,p1);
+  var pts=curve.getPoints(72);
+  var geo=new THREE.BufferGeometry().setFromPoints(pts);
+  var mat=new THREE.LineBasicMaterial({color:isMult?0xffd60a:0x4a9eff,transparent:true,opacity:isMult?1:.85,linewidth:2});
+  var line=new THREE.Line(geo,mat);
+  geo.setDrawRange(0,0);
+  CC.group.add(line);
+  /* Ziel-Marker */
+  var mk=glowSprite(isMult?'rgba(255,214,10,.9)':'rgba(74,158,255,.9)');
+  mk.scale.set(.001,.001,1); mk.position.copy(p1);
+  CC.group.add(mk);
+  CC.arcs.push({line:line,mat:mat,mk:mk,t0:performance.now(),mult:isMult});
+  if(CC.arcs.length>60){ var old=CC.arcs.shift(); CC.group.remove(old.line); CC.group.remove(old.mk); }
+  if(isMult){ var t=document.getElementById('cc-arc-toast');
+    if(t){ t.textContent='★ NEW MULT — ZONE '+zone; t.style.opacity=1; clearTimeout(CC._tt); CC._tt=setTimeout(function(){t.style.opacity=0;},2600); } }
+}
+
+/* ── Puls-Marker für aktuelle Station ── */
+function updCurPulse(){
+  if(!CC.group||!window.THREE) return;
+  var z=0;
+  try{ if(typeof curQSO!=='undefined'&&curQSO){ z=parseInt((curQSO.exchange&&curQSO.exchange.zone)?curQSO.exchange.zone:(curQSO.zone||0),10)||0; } }catch(e){}
+  if(z>0&&ZONE_LL[z]){
+    if(!CC.curPulse){ CC.curPulse=glowSprite('rgba(255,69,58,.95)'); CC.group.add(CC.curPulse); }
+    var ll=ZONE_LL[z]; CC.curPulse.position.copy(llToVec(ll[0],ll[1],1.015));
+    CC.curPulse.visible=true; CC.curPulse._z=z;
+  } else if(CC.curPulse){ CC.curPulse.visible=false; }
+}
+
+/* ── S-Meter ── */
+function initSMeter(){ CC.smc=document.getElementById('cc-smeter'); }
+function drawSMeter(){
+  var c=CC.smc; if(!c) return;
+  var g=c.getContext('2d'), W=c.width, H=c.height;
+  g.clearRect(0,0,W,H);
+  /* beleuchtetes Elfenbein-Zifferblatt */
+  var bg=g.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#f6ecd2'); bg.addColorStop(.75,'#eadfc0'); bg.addColorStop(1,'#d9cba6');
+  g.fillStyle=bg; g.fillRect(0,0,W,H);
+  var glow=g.createRadialGradient(W/2,H,20,W/2,H*.55,W*.55);
+  glow.addColorStop(0,'rgba(255,240,190,.55)'); glow.addColorStop(1,'rgba(255,240,190,0)');
+  g.fillStyle=glow; g.fillRect(0,0,W,H);
+  var cx=W/2, cy=H+56, R=H+20, a0=-Math.PI/2-.62, a1=-Math.PI/2+.62;
+  /* Skalenbogen: weiß S1-9, rot darüber */
+  g.lineWidth=5;
+  g.strokeStyle='#2c2c2a'; g.beginPath(); g.arc(cx,cy,R,a0,a0+(a1-a0)*.66); g.stroke();
+  g.strokeStyle='#a86b6d'; g.beginPath(); g.arc(cx,cy,R,a0+(a1-a0)*.66,a1); g.stroke();
+  g.textAlign='center'; g.textBaseline='middle';
+  var marks=[['1',0],['3',.222],['5',.444],['7',.555],['9',.66],['+20',.8],['+40',.93]];
+  for(var i=0;i<marks.length;i++){
+    var f=marks[i][1], a=a0+(a1-a0)*f;
+    var x1=cx+Math.cos(a)*(R-4), y1=cy+Math.sin(a)*(R-4), x2=cx+Math.cos(a)*(R-14), y2=cy+Math.sin(a)*(R-14);
+    g.strokeStyle=f>=.66?'#a86b6d':'#2c2c2a'; g.lineWidth=2.4;
+    g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+    g.fillStyle=f>=.66?'#a86b6d':'#2c2c2a'; g.font='600 17px -apple-system,sans-serif';
+    g.fillText(marks[i][0], cx+Math.cos(a)*(R-30), cy+Math.sin(a)*(R-30));
+  }
+  g.fillStyle='#5f5e5a'; g.font='700 15px -apple-system,sans-serif';
+  g.fillText('S · METER', cx, H-16);
+  /* Nadel mit Feder-Physik */
+  var na=a0+(a1-a0)*Math.max(0,Math.min(1,CC.needle));
+  g.save();
+  g.strokeStyle='#1a1208'; g.lineWidth=3; g.lineCap='round';
+  g.shadowColor='rgba(0,0,0,.35)'; g.shadowBlur=4; g.shadowOffsetY=2;
+  g.beginPath(); g.moveTo(cx+Math.cos(na)*24, cy+Math.sin(na)*24); g.lineTo(cx+Math.cos(na)*(R-8), cy+Math.sin(na)*(R-8)); g.stroke();
+  g.restore();
+  /* Nadel-Lagerung */
+  g.fillStyle='#2c2c2a'; g.beginPath(); g.arc(cx,H-4,7,Math.PI,0); g.fill();
+}
+
+/* ── Knöpfe ── */
+function initKnobs(){
+  var k=document.getElementById('cc-knob');
+  if(k&&!k._wired){
+    k._wired=true;
+    var ang=0, lastA=null, vel=0;
+    function center(){ var r=k.getBoundingClientRect(); return [r.left+r.width/2, r.top+r.height/2]; }
+    function apply(da){
+      ang+=da; vel=da;
+      k.style.transform='rotate('+ang+'deg)';
+      CC.rit=Math.max(-2000,Math.min(2000,CC.rit+Math.round(da*3.5)));
+      tick();
+    }
+    k.addEventListener('pointerdown',function(e){ e.preventDefault(); k.setPointerCapture(e.pointerId);
+      var c=center(); lastA=Math.atan2(e.clientY-c[1],e.clientX-c[0])*180/Math.PI; vel=0; });
+    k.addEventListener('pointermove',function(e){ if(lastA===null) return;
+      var c=center(), a=Math.atan2(e.clientY-c[1],e.clientX-c[0])*180/Math.PI;
+      var da=a-lastA; if(da>180)da-=360; if(da<-180)da+=360; lastA=a; apply(da); });
+    k.addEventListener('pointerup',function(){ lastA=null;
+      var iv=setInterval(function(){ vel*=.92; if(Math.abs(vel)<.4){clearInterval(iv);return;} apply(vel); },16); });
+    k.addEventListener('wheel',function(e){ e.preventDefault(); apply(e.deltaY>0?-6:6); },{passive:false});
+    k.addEventListener('dblclick',function(){ CC.rit=0; });
+  }
+  var af=document.getElementById('cc-af');
+  if(af&&!af._wired){
+    af._wired=true; var rot=CC.af*270-135;
+    af.style.transform='rotate('+rot+'deg)';
+    function setAF(d){ CC.af=Math.max(0,Math.min(1,CC.af+d));
+      af.style.transform='rotate('+(CC.af*270-135)+'deg)';
+      try{ if(typeof masterGain!=='undefined'&&masterGain) masterGain.gain.value=CC.af; }catch(e){} }
+    var ly=null;
+    af.addEventListener('pointerdown',function(e){ e.preventDefault(); af.setPointerCapture(e.pointerId); ly=e.clientY; });
+    af.addEventListener('pointermove',function(e){ if(ly===null)return; setAF((ly-e.clientY)*.008); ly=e.clientY; });
+    af.addEventListener('pointerup',function(){ ly=null; });
+    af.addEventListener('wheel',function(e){ e.preventDefault(); setAF(e.deltaY>0?-.05:.05); },{passive:false});
+  }
+}
+function tick(){ /* mechanisches Rast-Klicken */
+  try{
+    if(typeof audioCtx==='undefined'||!audioCtx) return;
+    var now=audioCtx.currentTime;
+    if(CC._lastTick&&now-CC._lastTick<.03) return; CC._lastTick=now;
+    var o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+    o.frequency.value=2400; gn.gain.setValueAtTime(.012,now); gn.gain.exponentialRampToValueAtTime(.0001,now+.012);
+    o.connect(gn); gn.connect(audioCtx.destination); o.start(now); o.stop(now+.015);
+  }catch(e){}
+}
+
+/* ── Sync mit App-Zustand ── */
+function syncPanel(){
+  try{
+    var vf=document.getElementById('vfo-freq');
+    var base=vf?parseFloat(vf.textContent)*1e6:14225000;
+    if(!isFinite(base)) base=14225000;
+    var f=Math.round(base+CC.rit);
+    var mhz=Math.floor(f/1e6), khz=Math.floor((f%1e6)/1000), hz=Math.floor((f%1000)/10);
+    var fe=document.getElementById('cc-freq');
+    if(fe) fe.innerHTML=mhz+'.'+String(khz).padStart(3,'0')+'.<small>'+String(hz).padStart(2,'0')+'</small>';
+    var re=document.getElementById('cc-rit');
+    if(re) re.innerHTML=CC.rit===0?'RIT ±0 Hz':'RIT <b>'+(CC.rit>0?'+':'')+CC.rit+' Hz</b> · dblclick = clear';
+    var vm=document.getElementById('vfo-mode'), me=document.getElementById('cc-mode');
+    if(vm&&me) me.textContent=vm.textContent;
+    var map=[['s-qso','cc-qso'],['s-mults','cc-mult'],['big-score','cc-score'],['s-qso','ccg-qso'],['s-mults','ccg-mult'],['big-score','ccg-score']];
+    map.forEach(function(p){ var a=document.getElementById(p[0]), b=document.getElementById(p[1]); if(a&&b) b.textContent=a.textContent; });
+    var d=new Date(), z=String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0')+':'+String(d.getUTCSeconds()).padStart(2,'0')+'z';
+    var u1=document.getElementById('cc-utc2'); if(u1) u1.textContent=z;
+    var u2=document.getElementById('cc-globe-utc'); if(u2) u2.textContent='UTC '+z+' · GREYLINE LIVE · '+(typeof myCall!=='undefined'?myCall:'—')+' @ '+(typeof myLocator!=='undefined'?myLocator:'—');
+    /* S-Meter-Ziel vom bestehenden Balken */
+    var sf=document.getElementById('smfill');
+    if(sf){ var w=parseFloat(sf.style.width)||0; CC.smTarget=w/100; }
+    /* Lampen */
+    var led=document.getElementById('rx-led');
+    var rx=led&&led.classList.contains('rx');
+    var pwr=false; try{ pwr=(typeof sessActive!=='undefined'&&sessActive); }catch(e){}
+    var lp=document.getElementById('cc-lamp-pwr'); if(lp) lp.classList.toggle('on-pwr',pwr);
+    var lr=document.getElementById('cc-lamp-rx'); if(lr) lr.classList.toggle('on-rx',!!rx);
+    var lt=document.getElementById('cc-lamp-tx'); if(lt) lt.classList.toggle('on-tx',CC._txFlash>Date.now());
+  }catch(e){}
+}
+
+/* ── Render-Loop ── */
+function startLoop(){
+  if(CC.raf) return;
+  var lastT=performance.now();
+  function frame(t){
+    CC.raf=null;
+    if(!CC.on) return;
+    var dt=Math.min(.05,(t-lastT)/1000); lastT=t;
+    /* Nadel-Physik (Feder + Dämpfung) */
+    CC.needleV+=(CC.smTarget-CC.needle)*90*dt - CC.needleV*10*dt;
+    CC.needle+=CC.needleV*dt;
+    drawSMeter();
+    /* Globus */
+    if(CC.renderer&&CC.cam){
+      if(!CC.dragging&&Date.now()-CC.lastDrag>5000) CC.theta+=.0006;
+      var sp=Math.sin(CC.phi), r=CC.dist;
+      CC.cam.position.set(r*sp*Math.cos(CC.theta), r*Math.cos(CC.phi), r*sp*Math.sin(CC.theta));
+      CC.cam.lookAt(0,0,0);
+      CC.earth.material.uniforms.sunDir.value=sunDirNow();
+      var now=performance.now();
+      for(var i=0;i<CC.arcs.length;i++){
+        var a=CC.arcs[i], age=(now-a.t0)/1000;
+        var grow=Math.min(1,age/1.1);
+        a.line.geometry.setDrawRange(0,Math.floor(73*grow));
+        var ms=grow>=1?(.09+.03*Math.sin(now/300+i)):.02+grow*.09;
+        a.mk.scale.set(ms,ms,1);
+        if(age>45) a.mat.opacity=Math.max(.18,(a.mult?1:.85)-(age-45)*.02);
+      }
+      if(CC.curPulse&&CC.curPulse.visible){
+        var ps=.1+.05*Math.sin(now/180);
+        CC.curPulse.scale.set(ps,ps,1);
+      }
+      if(CC.homeMk){ var hs=.11+.02*Math.sin(now/500); CC.homeMk.scale.set(hs,hs,1); }
+      CC.renderer.render(CC.scene,CC.cam);
+    }
+    CC.raf=requestAnimationFrame(frame);
+  }
+  CC.raf=requestAnimationFrame(frame);
+}
+
+/* ── Hooks in bestehende App ── */
+var _ccUpdLog=updLog;
+updLog=function(){
+  _ccUpdLog.apply(this,arguments);
+  try{
+    if(qsoLog.length>CC.prevQsoLen){
+      var e=qsoLog[0];
+      if(e&&!e.bust&&!e.dupe&&!e.skipped){
+        var z=parseInt(e.zone||0,10);
+        var m=(typeof sc!=='undefined'&&sc.mults>CC.prevMults);
+        if(z>0) addArc(z,m);
+        CC._txFlash=Date.now()+900;
+      }
+    }
+    CC.prevQsoLen=qsoLog.length;
+    if(typeof sc!=='undefined') CC.prevMults=sc.mults;
+  }catch(e){}
+};
+
+/* ── Init ── */
+addHeaderBtn();
+setInterval(syncPanel, 400);
+setInterval(updCurPulse, 800);
+try{
+  if(localStorage.getItem('hfct_layout_d')==='1') setLayoutD(true);
+}catch(e){}
+})();
+</script>
 
 </body>
 </html>
