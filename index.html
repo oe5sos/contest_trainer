@@ -11,9 +11,9 @@
   --acc:#4a7ba8;--acc2:#2f5c86;--acc3:#c25a5c;--acc4:#c2924f;--red:#c25a5c;--purple:#a07fa8;
   --dim:#191a1d;--dimb:#26262b;
   --txt:#dcdce1;--txt2:#909096;--txt3:#58585e;
-  --fmono:'SF Mono','Menlo','Monaco','Courier New',monospace;
-  --fhud:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
-  --fui:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;
+  --fmono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --fhud:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --fui:"Barlow Condensed","Helvetica Neue",Arial,sans-serif;
   --glow:none;--rad:8px;
 }
 /* ── THEME: LIGHT — weißer Hintergrund, Login-Farben ── */
@@ -716,6 +716,9 @@ body.layout-c .vfo-wrap{background:var(--lc-bg3);border-color:var(--lc-border)}
 body.layout-c .vfo-freq{font-size:16px;letter-spacing:.06em}
 
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 </head>
 <body>
 
@@ -8539,24 +8542,24 @@ function switchManLang(l){
 
 function renderManual(){
   var c=MANUAL_CONTENT[manLang];
-  var P='font-size:11px;line-height:1.7;color:rgba(255,255,255,.75);font-family:sans-serif;margin:0';
+  var P='font-size:11px;line-height:1.7;color:rgba(255,255,255,.75);font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin:0';
   var PB=P+' 0 8px 0';
   var TDk='padding:3px 8px 3px 0;color:#4a7ba8;white-space:nowrap;font-weight:600;vertical-align:top';
   var TDv='padding:3px 0;color:rgba(255,255,255,.7)';
-  function sec(h,body){return '<div style="margin-bottom:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#4a7ba8;border-bottom:1px solid rgba(74,158,255,.2);padding-bottom:5px;margin-bottom:9px;font-family:sans-serif;font-weight:700">'+h+'</div>'+body+'</div>';}
-  function tbl(rows){var r='<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:11px">';rows.forEach(function(row){r+='<tr><td style="'+TDk+'">'+row[0]+'</td><td style="'+TDv+'">'+row[1]+'</td></tr>';});return r+'</table>';}
+  function sec(h,body){return '<div style="margin-bottom:18px"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#4a7ba8;border-bottom:1px solid rgba(74,158,255,.2);padding-bottom:5px;margin-bottom:9px;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;font-weight:700">'+h+'</div>'+body+'</div>';}
+  function tbl(rows){var r='<table style="width:100%;border-collapse:collapse;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;font-size:11px">';rows.forEach(function(row){r+='<tr><td style="'+TDk+'">'+row[0]+'</td><td style="'+TDv+'">'+row[1]+'</td></tr>';});return r+'</table>';}
   var h='';
   // s1
   h+=sec(c.s1h,'<p style="'+P+'">'+c.s1+'</p>');
   // s2
   h+=sec(c.s2h,tbl(c.s2));
   // s3
-  var kbRows='<table style="border-collapse:collapse;font-family:sans-serif;width:100%">';
+  var kbRows='<table style="border-collapse:collapse;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;width:100%">';
   c.s3.forEach(function(row,i){kbRows+='<tr style="'+(i%2===0?'background:rgba(255,255,255,.03)':'')+'"><td style="padding:5px 10px 5px 0"><kbd class="mk">'+row[0]+'</kbd></td><td style="font-size:11px;color:rgba(255,255,255,.75);padding:5px 0">'+row[1]+'</td></tr>';});
-  kbRows+='</table><p style="font-size:10px;color:rgba(255,255,255,.4);font-family:sans-serif;margin:8px 0 0 0">'+c.s3note+'</p>';
+  kbRows+='</table><p style="font-size:10px;color:rgba(255,255,255,.4);font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin:8px 0 0 0">'+c.s3note+'</p>';
   h+=sec(c.s3h,kbRows);
   // s4
-  var v4='<p style="'+PB+'">'+c.s4pre+'</p><ol style="font-size:11px;line-height:1.8;color:rgba(255,255,255,.7);font-family:sans-serif;margin:0 0 8px 0;padding-left:18px">';
+  var v4='<p style="'+PB+'">'+c.s4pre+'</p><ol style="font-size:11px;line-height:1.8;color:rgba(255,255,255,.7);font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin:0 0 8px 0;padding-left:18px">';
   c.s4steps.forEach(function(st){v4+='<li>'+st+'</li>';});
   v4+='</ol><p style="'+P+'">'+c.s4post+'</p>';
   h+=sec(c.s4h,v4);
@@ -8568,37 +8571,37 @@ function renderManual(){
   // s7 rate meter
   h+=sec(c.s7h,'<p style="'+P+'">'+c.s7+'</p>');
   // s8 difficulty
-  var dTbl='<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:11px">';
+  var dTbl='<table style="width:100%;border-collapse:collapse;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;font-size:11px">';
   c.s8.forEach(function(row){dTbl+='<tr><td style="padding:4px 8px 4px 0;color:'+row[2]+';white-space:nowrap;font-weight:600;vertical-align:top">'+row[0]+'</td><td style="padding:4px 0;color:rgba(255,255,255,.7)">'+row[1]+'</td></tr>';});
   dTbl+='</table>';
   h+=sec(c.s8h,dTbl);
   // s9 audio
   h+=sec(c.s9h,tbl(c.s9));
   // s10 accents
-  var s10body='<p style="'+PB+'">'+c.s10pre+'</p>'+tbl(c.s10)+'<p style="font-size:10px;color:rgba(255,255,255,.4);font-family:sans-serif;margin:8px 0 0 0">'+c.s10note+'</p>';
+  var s10body='<p style="'+PB+'">'+c.s10pre+'</p>'+tbl(c.s10)+'<p style="font-size:10px;color:rgba(255,255,255,.4);font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin:8px 0 0 0">'+c.s10note+'</p>';
   h+=sec(c.s10h,s10body);
   // s11 score
   h+=sec(c.s11h,'<p style="'+P+'">'+c.s11+'</p>');
   // footer
-  h+='<div style="margin-top:24px;text-align:center;font-size:9px;color:rgba(255,255,255,.25);font-family:sans-serif;letter-spacing:1px">HF Contest Trainer · v6.53 · '+c.footer+'</div>';
+  h+='<div style="margin-top:24px;text-align:center;font-size:9px;color:rgba(255,255,255,.25);font-family:"Barlow","Helvetica Neue",Arial,sans-serif;letter-spacing:1px">HF Contest Trainer · v6.53 · '+c.footer+'</div>';
   var el=document.getElementById('manual-body');
   if(el) el.innerHTML=h;
 }
 </script>
 <style>
-.mk{background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;font-family:monospace;font-size:10px;color:#fff}
+.mk{background:rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;color:#fff}
 </style>
 
 <div id="manual-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;overflow-y:auto;backdrop-filter:blur(6px)" onclick="if(event.target===this)hideManual()">
   <div style="max-width:640px;margin:40px auto 60px;background:#0d0d1a;border:1px solid rgba(74,158,255,.25);border-radius:16px;padding:28px 30px;position:relative">
     <button onclick="hideManual()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:16px;cursor:pointer;border-radius:8px;width:30px;height:30px;line-height:1">✕</button>
-    <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:rgba(255,255,255,.35);text-transform:uppercase;font-family:sans-serif;margin-bottom:6px">HF Contest Trainer</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:4px;color:rgba(255,255,255,.35);text-transform:uppercase;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin-bottom:6px">HF Contest Trainer</div>
     <!-- Language selector -->
     <div style="display:flex;gap:6px;margin-bottom:18px;align-items:center">
-      <button id="mbl-de" onclick="switchManLang('de')" style="background:rgba(74,158,255,.25);border:1px solid rgba(74,158,255,.35);color:#4a7ba8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">DE</button>
-      <button id="mbl-es" onclick="switchManLang('es')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">ES</button>
-      <button id="mbl-en" onclick="switchManLang('en')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:sans-serif;letter-spacing:.5px">EN</button>
-      <div id="manual-title" style="font-size:20px;font-weight:300;color:#4a7ba8;letter-spacing:1px;font-family:sans-serif;margin-left:8px">Handbuch</div>
+      <button id="mbl-de" onclick="switchManLang('de')" style="background:rgba(74,158,255,.25);border:1px solid rgba(74,158,255,.35);color:#4a7ba8;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;letter-spacing:.5px">DE</button>
+      <button id="mbl-es" onclick="switchManLang('es')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;letter-spacing:.5px">ES</button>
+      <button id="mbl-en" onclick="switchManLang('en')" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;letter-spacing:.5px">EN</button>
+      <div id="manual-title" style="font-size:20px;font-weight:300;color:#4a7ba8;letter-spacing:1px;font-family:"Barlow","Helvetica Neue",Arial,sans-serif;margin-left:8px">Handbuch</div>
     </div>
     <!-- Dynamic content -->
     <div id="manual-body"></div>
